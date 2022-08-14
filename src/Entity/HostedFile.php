@@ -58,38 +58,6 @@ class HostedFile
     private string $virtualDirectory;
 
     /**
-     * @return bool
-     */
-    public function isInfected(): bool
-    {
-        return $this->infected;
-    }
-
-    /**
-     * @param bool $infected
-     */
-    public function setInfected(bool $infected): void
-    {
-        $this->infected = $infected;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getScanResult(): ?string
-    {
-        return $this->scanResult;
-    }
-
-    /**
-     * @param string|null $scanResult
-     */
-    public function setScanResult(?string $scanResult): void
-    {
-        $this->scanResult = $scanResult;
-    }
-
-    /**
      * Size in MB
      * @ORM\Column(type="float")
      * @groups("file:read")
@@ -109,7 +77,7 @@ class HostedFile
     private bool $infected = false;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="text", length=2000, nullable=true)
      * @groups("file:read")
      */
     private ?string $scanResult;
@@ -376,5 +344,37 @@ class HostedFile
     public function setAuthorizedUsers(array $authorizedUsers): void
     {
         $this->authorizedUsers = $authorizedUsers;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInfected(): bool
+    {
+        return $this->infected;
+    }
+
+    /**
+     * @param bool $infected
+     */
+    public function setInfected(bool $infected): void
+    {
+        $this->infected = $infected;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getScanResult(): ?string
+    {
+        return $this->scanResult;
+    }
+
+    /**
+     * @param string|null $scanResult
+     */
+    public function setScanResult(?string $scanResult): void
+    {
+        $this->scanResult = $scanResult;
     }
 }
