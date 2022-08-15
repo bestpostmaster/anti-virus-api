@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\HostedFile;
+use App\Entity\User;
 use App\Message\VirusScannerMessage;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,10 +21,12 @@ use App\Service\VirusScannerService;
 class FilesController extends AbstractController
 {
     private string $hostingDirectory;
+    private ManagerRegistry $doctrine;
 
-    public function __construct(string $hostingDirectory)
+    public function __construct(string $hostingDirectory, ManagerRegistry $doctrine)
     {
         $this->hostingDirectory = $hostingDirectory;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -44,7 +48,7 @@ class FilesController extends AbstractController
      * TO DO
      * @Route("/api/files/upload", name="app_files_upload")
      */
-    public function upload(Request $request, LoggerInterface $logger, ManagerRegistry $doctrine, VirusScannerService $virusScannerService, MessageBusInterface $bus): Response
+    public function upload(Request $request, LoggerInterface $logger, VirusScannerService $virusScannerService, MessageBusInterface $bus): Response
     {
         if (empty($request->files) || !($request->files)->get("file")) {
             throw new \Exception('No file sent');
@@ -64,12 +68,19 @@ class FilesController extends AbstractController
             throw new \Exception('Upload error...');
         }
 
+        $currentUser = $this->getUser();
+        $manager = $this->doctrine->getManager();
+        $currentUser = $manager->find(User::class, $currentUser->getId());
+
+        $fileSize = round(filesize($this->hostingDirectory.$name)/1000000, 4);
+        $this->checkUserCanUpload($currentUser, $fileSize);
+
         $file = new HostedFile();
         $file->setName($name);
         $file->setClientName($receivedFile->getClientOriginalName());
         $file->setUploadDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $file->setUser($this->getUser());
-        $file->setSize(filesize($this->hostingDirectory.$name)/1000000);
+        $file->setSize($fileSize);
         $file->setScaned(false);
         $file->setDescription($request->get("description") ?? $receivedFile->getClientOriginalName());
         $file->setFilePassword($request->get("filePassword") ?? '');
@@ -80,9 +91,11 @@ class FilesController extends AbstractController
         $file->setConversionsAvailable('');
         $file->setVirtualDirectory('/');
 
-        $manager = $doctrine->getManager();
+        $manager = $this->doctrine->getManager();
         $manager->persist($file);
         $manager->flush($file);
+
+        $this->updateUserSpace($currentUser, $fileSize);
 
         //Without Messenger
         //$virusScannerService->scan($file);
@@ -203,5 +216,22 @@ class FilesController extends AbstractController
         $conversionStatus = $converter->convert($fileId, $convertTo);
 
         return $this->json([], 200, [], ['groups' => 'file:read']);
+    }
+
+    private function checkUserCanUpload(User $user, float $fileSize):bool
+    {
+        if($fileSize + $user->getTotalSpaceUsedMo() > $user ->getAuthorizedSizeMo()) {
+            throw new Exception('not enough storage space');
+        }
+
+        return true;
+    }
+
+    private function updateUserSpace(User $user, float $fileSize):void
+    {
+        $manager = $this->doctrine->getManager();
+        $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo()+$fileSize);
+        $manager->persist($user);
+        $manager->flush($user);
     }
 }

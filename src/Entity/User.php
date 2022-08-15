@@ -110,16 +110,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $files;
 
     /**
-     * @ORM\Column(type="integer", length=60, nullable=true)
+     * @ORM\Column(type="float", length=60, nullable=true)
      * @groups("user:read", "file:read")
      */
-    private int $totalSpaceUsedMo = 0;
+    private float $totalSpaceUsedMo = 0;
 
     /**
-     * @ORM\Column(type="integer", length=60, nullable=true)
+     * @ORM\Column(type="float", nullable=true, options={"default" : 100.0000})
      * @groups("user:read", "file:read")
      */
-    private $authorizedSizeMo = 100;
+    private float $authorizedSizeMo = 100.0000;
 
     /**
      * @ORM\Column(type="datetime", length=60, nullable=true)
@@ -360,20 +360,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private string $secretTokenForValidation;
 
-    /**
-     * @return int
-     */
-    public function getTotalSpaceUsedMo(): int
+    public function getTotalSpaceUsedMo(): float
     {
         return $this->totalSpaceUsedMo;
     }
 
-    /**
-     * @param int $totalSpaceUsedMo
-     */
-    public function setTotalSpaceUsedMo(int $totalSpaceUsedMo): void
+    public function setTotalSpaceUsedMo(float $totalSpaceUsedMo): self
     {
         $this->totalSpaceUsedMo = $totalSpaceUsedMo;
+
+        return $this;
     }
 
     public function getAuthorizedSizeMo(): ?int
@@ -381,7 +377,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->authorizedSizeMo;
     }
 
-    public function setAuthorizedSizeMo(int $authorizedSizeMo): self
+    public function setAuthorizedSizeMo(float $authorizedSizeMo): self
     {
         $this->authorizedSizeMo = $authorizedSizeMo;
 
