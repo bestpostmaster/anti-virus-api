@@ -95,7 +95,7 @@ class FilesController extends AbstractController
         $manager->persist($file);
         $manager->flush($file);
 
-        $this->updateUserSpace($currentUser, $fileSize);
+        $this->increaseUserSpace($currentUser, $fileSize);
 
         //Without Messenger
         //$virusScannerService->scan($file);
@@ -188,6 +188,7 @@ class FilesController extends AbstractController
         }
 
         $manager = $doctrine->getManager();
+        $currentUser = $manager->find(User::class, $this->getUser());
         $manager->remove($result);
         $manager->flush();
 
@@ -196,6 +197,8 @@ class FilesController extends AbstractController
         if(file_exists($fullPath)) {
             unlink($this->hostingDirectory . $result->getName());
         }
+
+        $this->decreaseUserSpace($currentUser, $result->getSize());
 
         return $this->json([], 200);
     }
@@ -227,10 +230,18 @@ class FilesController extends AbstractController
         return true;
     }
 
-    private function updateUserSpace(User $user, float $fileSize):void
+    private function increaseUserSpace(User $user, float $sizeToAdd):void
     {
         $manager = $this->doctrine->getManager();
-        $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo()+$fileSize);
+        $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo()+$sizeToAdd);
+        $manager->persist($user);
+        $manager->flush($user);
+    }
+
+    private function decreaseUserSpace(User $user, float $sizeToDeduct):void
+    {
+        $manager = $this->doctrine->getManager();
+        $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo()-$sizeToDeduct);
         $manager->persist($user);
         $manager->flush($user);
     }

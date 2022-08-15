@@ -11,10 +11,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FilesControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
+    private string $hostingDirectory;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
+        $this->hostingDirectory = static::getContainer()->getParameter('kernel.project_dir').'/public/up/';
     }
 
     /**
@@ -53,5 +55,7 @@ class FilesControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSame($responseData['description'], 'My awesome image!');
+        self::assertTrue(file_exists(            $this->hostingDirectory.$responseData['name']));
+        self::assertTrue($responseData['size'] === round(filesize($this->hostingDirectory.$responseData['name'])/1000000, 4));
     }
 }
