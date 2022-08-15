@@ -1,5 +1,6 @@
 This API provides a complete system for authenticating via JWT and uploading files.
 An admin exists, and he has endpoints that allow him to manage users
+After the upload, an anti-virus scan is performed asynchronously by ClamAV. It is therefore important to install ClamAV and configure it correctly
 
 Installation
 -------------------------------------------------------------------
@@ -18,6 +19,9 @@ HOSTING_DIRECTORY=path/to/hosting/directory/
 php bin/console doctrine:fixtures:load
 php bin/console lexik:jwt:generate-keypair
 symfony server:start
+
+Install ClamAV :
+https://www.rosehosting.com/blog/how-to-install-clamav-on-debian-9-and-scan-for-vulnerabilities/
 
 Test
 -------------------------------------------------------------------
