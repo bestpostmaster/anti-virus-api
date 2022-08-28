@@ -104,7 +104,7 @@ class HostedFile
      * @ORM\Column(type="string", length=255, nullable=true)
      * @groups("file:read")
      */
-    private $uploadLocalisation;
+    private string $uploadLocalisation;
 
     /**
      * @ORM\Column(type="boolean")
@@ -146,9 +146,9 @@ class HostedFile
         return $this;
     }
 
-    public function getUser(): ?UserInterface
+    public function getUser(): ?int
     {
-        return $this->user;
+        return $this->user->getId();
     }
 
     public function setUser(?UserInterface $user): self

@@ -108,7 +108,7 @@ class FilesController extends AbstractController
     /**
      * @Route("/api/files/download/{url}", name="app_files_download")
      */
-    public function download(Request $request, HostedFileRepository $hostedFileRepository): BinaryFileResponse
+    public function download(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): BinaryFileResponse
     {
         $userId = ($this->getUser())->getId();
         $url = $request->get("url");
@@ -134,6 +134,11 @@ class FilesController extends AbstractController
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             $result->getDescription().'.'.$extension
         );
+
+        $em = $doctrine->getManager();
+        $result->setDownloadCounter($result->getDownloadCounter()+1);
+        $em->persist($result);
+        $em->flush();
 
         return $response;
     }
