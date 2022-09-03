@@ -28,3 +28,10 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+
+    api.event.authentication_failure_listener:
+        class: App\Subscriber\AuthenticationFailureListener
+        #arguments: [Doctrine\Persistence\ManagerRegistry]
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
