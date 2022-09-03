@@ -12,10 +12,14 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserFixtures extends Fixture
 {
      private UserPasswordHasherInterface $passwordEncoder;
+    private string $adminPassword;
+    private string $defaultUserPassword;
 
-     public function __construct(UserPasswordHasherInterface $passwordEncoder)
+     public function __construct(UserPasswordHasherInterface $passwordEncoder, string $adminPassword, string $defaultUserPassword)
      {
          $this->passwordEncoder = $passwordEncoder;
+         $this->adminPassword = $adminPassword;
+         $this->defaultUserPassword = $defaultUserPassword;
      }
 
     public function load(ObjectManager $manager): void
@@ -24,12 +28,12 @@ class UserFixtures extends Fixture
             [
                 'login' => 'admin',
                 'roles' => ['ROLE_ADMIN'],
-                'pass' => 'f56f5h4f6g5h4f56df5gh4_admin'
+                'pass' => $this->adminPassword
             ],
             [
                 'login' => 'user',
                 'roles' => ['ROLE_USER'],
-                'pass' => 'f56f5h4f6g5h4f56df5gh4'
+                'pass' => $this->defaultUserPassword
             ]
         ];
 
