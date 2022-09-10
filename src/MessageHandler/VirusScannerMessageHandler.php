@@ -24,6 +24,8 @@ final class VirusScannerMessageHandler implements MessageHandlerInterface
     public function __invoke(VirusScannerMessage $message)
     {
         $hostedFile = $this->em->find(HostedFile::class, $message->getFileId());
+        echo "\n >>SCAN... File id : ".$message->getFileId()."\n";
         $this->virusScannerService->scan($hostedFile);
+        echo "\n END. \n";
     }
 }

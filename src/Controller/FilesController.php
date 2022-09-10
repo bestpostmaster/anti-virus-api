@@ -109,6 +109,80 @@ class FilesController extends AbstractController
     }
 
     /**
+     * TO DO
+     *
+     * @Route("/api/files/upload-from-url", name="app_files_upload_from_url")
+     */
+    public function uploadFromUrl(Request $request, LoggerInterface $logger, VirusScannerService $virusScannerService, MessageBusInterface $bus): Response
+    {
+        if (!$request->get('url')) {
+            throw new \Exception('No url sent');
+        }
+
+        $url = $request->get('url');
+        $logger->info('Try to upload file : '.$url);
+
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            throw new \Exception('No user logged in');
+        }
+
+        $fileName = basename($url);
+
+        // Url from AWS-S3
+        if (isset(explode('?', $fileName)[1]) && explode('?', $fileName)[1] !== '') {
+            $fileName = explode('?', $fileName)[0];
+        }
+
+        $name = md5(uniqid((string) mt_rand(), true)).'.'.strtolower(explode('.', $fileName)[1] ?? 'html');
+
+        try {
+            file_put_contents($this->hostingDirectory.$name, file_get_contents($url));
+        } catch (\Exception $exception) {
+            throw new \Exception($exception->getMessage());
+        }
+
+        if (!file_exists($this->hostingDirectory.$name)) {
+            throw new \Exception('Upload error...');
+        }
+
+        $currentUser = $this->getUser();
+        $manager = $this->doctrine->getManager();
+        $currentUser = $manager->find(User::class, $currentUser->getId());
+
+        $fileSize = round(filesize($this->hostingDirectory.$name) / 1000000, 4);
+        $this->checkUserCanUpload($currentUser, $fileSize);
+
+        $file = new HostedFile();
+        $file->setName($name);
+        $file->setClientName($fileName ?? $url);
+        $file->setUploadDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $file->setUser($this->getUser());
+        $file->setSize($fileSize);
+        $file->setScaned(false);
+        $file->setDescription($request->get('description') ?? $url);
+        $file->setFilePassword($request->get('filePassword') ?? '');
+        $file->setDownloadCounter(0);
+        $file->setUrl(md5(uniqid((string) mt_rand(), true)).md5(uniqid((string) mt_rand(), true)));
+        $file->setUploadLocalisation($_SERVER['REMOTE_ADDR'] ?? '');
+        $file->setCopyrightIssue(false);
+        $file->setConversionsAvailable('');
+        $file->setVirtualDirectory('/');
+
+        $manager = $this->doctrine->getManager();
+        $manager->persist($file);
+        $manager->flush($file);
+
+        $this->increaseUserSpace($currentUser, $fileSize);
+
+        // Without Messenger
+        // $virusScannerService->scan($file);
+
+        $bus->dispatch(new VirusScannerMessage($file->getId()));
+
+        return $this->json($file, 200, [], ['groups' => 'file:read']);
+    }
+
+    /**
      * @Route("/api/files/download/{url}", name="app_files_download")
      */
     public function download(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): BinaryFileResponse
