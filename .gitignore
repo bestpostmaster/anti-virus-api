@@ -20,4 +20,5 @@
 ###< phpunit/phpunit ###
 
 ###< VAULT secrets ###
-/config/secrets/
+/config/secrets/dev/
+/config/secrets/prod/
