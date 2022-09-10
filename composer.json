@@ -10,6 +10,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/migrations": "^3.5",
         "doctrine/orm": "^2.10 || ^3.0",
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
         "lexik/jwt-authentication-bundle": "^2.16",
         "paragonie/sodium_compat": "^1.17",
         "symfony/apache-pack": "^1.0",
@@ -79,7 +80,6 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^3.4",
         "phpstan/phpstan": "^1.8",
         "phpunit/phpunit": "^9.5",
         "symfony/maker-bundle": "v1.39.0",
