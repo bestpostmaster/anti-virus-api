@@ -7,7 +7,11 @@ namespace App\Controller;
 use App\Entity\HostedFile;
 use App\Entity\User;
 use App\Message\VirusScannerMessage;
-use Exception;
+use App\Repository\HostedFileRepository;
+use App\Service\FileConverterService;
+use App\Service\VirusScannerService;
+use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\HostedFileRepository;
-use Psr\Log\LoggerInterface;
-use Doctrine\Persistence\ManagerRegistry;
-use App\Service\VirusScannerService;
 
 class FilesController extends AbstractController
 {
@@ -36,7 +36,7 @@ class FilesController extends AbstractController
      */
     public function index(HostedFileRepository $hostedFileRepository, string $hostingDirectory): Response
     {
-        $userId = ($this->getUser())->getId();
+        $userId = $this->getUser()->getId();
         $this->hostingDirectory = $hostingDirectory;
 
         if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
@@ -48,22 +48,23 @@ class FilesController extends AbstractController
 
     /**
      * TO DO
+     *
      * @Route("/api/files/upload", name="app_files_upload")
      */
     public function upload(Request $request, LoggerInterface $logger, VirusScannerService $virusScannerService, MessageBusInterface $bus): Response
     {
-        if (empty($request->files) || !($request->files)->get("file")) {
+        if (empty($request->files) || !$request->files->get('file')) {
             throw new \Exception('No file sent');
         }
 
-        $receivedFile = ($request->files)->get("file");
+        $receivedFile = $request->files->get('file');
         $logger->info('Try to upload file : '.$receivedFile->getClientOriginalName());
 
         if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
         }
 
-        $name = md5(uniqid((string)mt_rand(), true)).'.'.strtolower($receivedFile->getClientOriginalExtension());
+        $name = md5(uniqid((string) mt_rand(), true)).'.'.strtolower($receivedFile->getClientOriginalExtension());
         $receivedFile->move($this->hostingDirectory, $name);
 
         if (!file_exists($this->hostingDirectory.$name)) {
@@ -74,7 +75,7 @@ class FilesController extends AbstractController
         $manager = $this->doctrine->getManager();
         $currentUser = $manager->find(User::class, $currentUser->getId());
 
-        $fileSize = round(filesize($this->hostingDirectory.$name)/1000000, 4);
+        $fileSize = round(filesize($this->hostingDirectory.$name) / 1000000, 4);
         $this->checkUserCanUpload($currentUser, $fileSize);
 
         $file = new HostedFile();
@@ -84,10 +85,10 @@ class FilesController extends AbstractController
         $file->setUser($this->getUser());
         $file->setSize($fileSize);
         $file->setScaned(false);
-        $file->setDescription($request->get("description") ?? $receivedFile->getClientOriginalName());
-        $file->setFilePassword($request->get("filePassword") ?? '');
+        $file->setDescription($request->get('description') ?? $receivedFile->getClientOriginalName());
+        $file->setFilePassword($request->get('filePassword') ?? '');
         $file->setDownloadCounter(0);
-        $file->setUrl(md5(uniqid((string)mt_rand(), true)).md5(uniqid((string)mt_rand(), true)));
+        $file->setUrl(md5(uniqid((string) mt_rand(), true)).md5(uniqid((string) mt_rand(), true)));
         $file->setUploadLocalisation($_SERVER['REMOTE_ADDR'] ?? '');
         $file->setCopyrightIssue(false);
         $file->setConversionsAvailable('');
@@ -99,8 +100,8 @@ class FilesController extends AbstractController
 
         $this->increaseUserSpace($currentUser, $fileSize);
 
-        //Without Messenger
-        //$virusScannerService->scan($file);
+        // Without Messenger
+        // $virusScannerService->scan($file);
 
         $bus->dispatch(new VirusScannerMessage($file->getId()));
 
@@ -112,8 +113,8 @@ class FilesController extends AbstractController
      */
     public function download(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): BinaryFileResponse
     {
-        $userId = ($this->getUser())->getId();
-        $url = $request->get("url");
+        $userId = $this->getUser()->getId();
+        $url = $request->get('url');
 
         if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
@@ -130,14 +131,14 @@ class FilesController extends AbstractController
         }
 
         $response = new BinaryFileResponse($this->hostingDirectory.$result->getName());
-        $extension = (explode('.', $result->getName()))[1] ?? '';
+        $extension = explode('.', $result->getName())[1] ?? '';
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             $result->getDescription().'.'.$extension
         );
 
         $em = $doctrine->getManager();
-        $result->setDownloadCounter($result->getDownloadCounter()+1);
+        $result->setDownloadCounter($result->getDownloadCounter() + 1);
         $em->persist($result);
         $em->flush();
 
@@ -149,8 +150,8 @@ class FilesController extends AbstractController
      */
     public function fileInfo(Request $request, HostedFileRepository $hostedFileRepository): Response
     {
-        $userId = ($this->getUser())->getId();
-        $id = $request->get("fileId");
+        $userId = $this->getUser()->getId();
+        $id = $request->get('fileId');
 
         if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
@@ -174,8 +175,8 @@ class FilesController extends AbstractController
      */
     public function deleteById(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): Response
     {
-        $userId = ($this->getUser())->getId();
-        $id = $request->get("fileId");
+        $userId = $this->getUser()->getId();
+        $id = $request->get('fileId');
 
         if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
@@ -199,7 +200,7 @@ class FilesController extends AbstractController
         $fullPath = $this->hostingDirectory.$result->getName();
 
         if (file_exists($fullPath)) {
-            unlink($this->hostingDirectory . $result->getName());
+            unlink($this->hostingDirectory.$result->getName());
         }
 
         $this->decreaseUserSpace($currentUser, $result->getSize());
@@ -209,26 +210,27 @@ class FilesController extends AbstractController
 
     /**
      * TO DO
+     *
      * @Route("/api/files/convert/{fileId}/{convertTo}", name="app_files_convert")
      */
-    public function convert(Request $request, Converter $converter): Response
+    public function convert(Request $request, FileConverterService $converter): Response
     {
         if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
         }
 
-        $fileId = $request->get("fileId");
-        $convertTo = $request->get("convertTo");
+        $fileId = $request->get('fileId');
+        $convertTo = $request->get('convertTo');
 
-        $conversionStatus = $converter->convert($fileId, $convertTo);
+        $resultPath = $converter->convert($fileId, $convertTo);
 
-        return $this->json([], 200, [], ['groups' => 'file:read']);
+        return $this->json(['resultPath' => $resultPath], 200, [], ['groups' => 'file:read']);
     }
 
     private function checkUserCanUpload(User $user, float $fileSize): bool
     {
-        if ($fileSize + $user->getTotalSpaceUsedMo() > $user ->getAuthorizedSizeMo()) {
-            throw new Exception('not enough storage space');
+        if ($fileSize + $user->getTotalSpaceUsedMo() > $user->getAuthorizedSizeMo()) {
+            throw new \Exception('not enough storage space');
         }
 
         return true;
@@ -237,7 +239,7 @@ class FilesController extends AbstractController
     private function increaseUserSpace(User $user, float $sizeToAdd): void
     {
         $manager = $this->doctrine->getManager();
-        $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo()+$sizeToAdd);
+        $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo() + $sizeToAdd);
         $manager->persist($user);
         $manager->flush($user);
     }
@@ -245,7 +247,7 @@ class FilesController extends AbstractController
     private function decreaseUserSpace(User $user, float $sizeToDeduct): void
     {
         $manager = $this->doctrine->getManager();
-        $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo()-$sizeToDeduct);
+        $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo() - $sizeToDeduct);
         $manager->persist($user);
         $manager->flush($user);
     }

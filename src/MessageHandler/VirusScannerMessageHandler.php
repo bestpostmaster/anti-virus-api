@@ -15,10 +15,6 @@ final class VirusScannerMessageHandler implements MessageHandlerInterface
     private EntityManagerInterface $em;
     private VirusScannerService $virusScannerService;
 
-    /**
-     * @param EntityManagerInterface $em
-     * @param VirusScannerService $virusScannerService
-     */
     public function __construct(EntityManagerInterface $em, VirusScannerService $virusScannerService)
     {
         $this->em = $em;

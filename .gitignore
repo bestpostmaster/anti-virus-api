@@ -8,7 +8,10 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+## PHPSTORM ###
 /**/.idea/*
+.idea/*
+/.idea/*
 
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem

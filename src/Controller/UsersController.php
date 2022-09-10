@@ -10,8 +10,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class UsersController extends AbstractController
@@ -45,7 +45,7 @@ class UsersController extends AbstractController
             throw new \Exception('Admin only !');
         }
 
-        $result = $userRepository->findOneBy(['id'=>$request->get('userId')]);
+        $result = $userRepository->findOneBy(['id' => $request->get('userId')]);
         if (!$result) {
             throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
         }
@@ -55,6 +55,7 @@ class UsersController extends AbstractController
 
     /**
      * @Route("/api/admin/edit-user/{userId}", name="edit_user")
+     *
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      */
     public function editUserInfos(Request $request, UserRepository $userRepository, ManagerRegistry $doctrine): Response
@@ -63,7 +64,7 @@ class UsersController extends AbstractController
             throw new \Exception('Admin only !');
         }
 
-        $user = $userRepository->findOneBy(['id'=>$request->get('userId')]);
+        $user = $userRepository->findOneBy(['id' => $request->get('userId')]);
         if (!$user) {
             throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
         }
@@ -91,7 +92,7 @@ class UsersController extends AbstractController
         $user->setLogin($data->username);
         $user->setRoles($data->roles);
         $user->setRegistrationDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-        $user->setSecretTokenForValidation(md5(uniqid((string)mt_rand(), true)).md5(uniqid((string)mt_rand(), true)));
+        $user->setSecretTokenForValidation(md5(uniqid((string) mt_rand(), true)).md5(uniqid((string) mt_rand(), true)));
         $user->setPassword($this->passwordEncoder->hashPassword(
             $user,
             $data->password
@@ -105,8 +106,6 @@ class UsersController extends AbstractController
     }
 
     /**
-     * @param Request $request
-     * @param User $user
      * @return void
      */
     public function hydrateUser(Request $request, User $user): User

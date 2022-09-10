@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
-use App\Entity\HostedFile;
 use App\Entity\User;
-use DateTimeZone;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -30,13 +28,13 @@ class UserFixtures extends Fixture
             [
                 'login' => 'admin',
                 'roles' => ['ROLE_ADMIN'],
-                'pass' => $this->adminPassword
+                'pass' => $this->adminPassword,
             ],
             [
                 'login' => 'user',
                 'roles' => ['ROLE_USER'],
-                'pass' => $this->defaultUserPassword
-            ]
+                'pass' => $this->defaultUserPassword,
+            ],
         ];
 
         foreach ($users as $item) {

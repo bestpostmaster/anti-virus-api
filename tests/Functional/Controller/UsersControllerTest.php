@@ -33,21 +33,21 @@ class UsersControllerTest extends WebTestCase
     {
         $userRepository = static::getContainer()->get(UserRepository::class);
 
-        $admin = $userRepository->findOneBy(['login' =>'admin']);
+        $admin = $userRepository->findOneBy(['login' => 'admin']);
 
         $this->client->loginUser($admin);
 
-        $login = uniqid((string)mt_rand(), true);
+        $login = uniqid((string) mt_rand(), true);
 
         $this->client->jsonRequest('POST', '/api/admin/users/add', [
             'username' => $login,
             'password' => '5g4h6fghf6ghfh65fgh46',
             'roles' => [
-                'ROLE_USER'
-            ]
+                'ROLE_USER',
+            ],
         ]);
 
-        $responseData = json_decode(($this->client->getResponse())->getContent(), true);
+        $responseData = json_decode($this->client->getResponse()->getContent(), true);
 
         self::assertResponseIsSuccessful();
         self::assertSame($responseData['login'], $login);
@@ -57,16 +57,16 @@ class UsersControllerTest extends WebTestCase
     {
         $userRepository = static::getContainer()->get(UserRepository::class);
 
-        $admin = $userRepository->findOneBy(['login' =>'user']);
+        $admin = $userRepository->findOneBy(['login' => 'user']);
 
         $this->client->loginUser($admin);
 
         $this->client->jsonRequest('POST', '/api/admin/users/add', [
-            'username' => uniqid((string)mt_rand(), true),
+            'username' => uniqid((string) mt_rand(), true),
             'password' => '5g4h6fghf6ghfh65fgh46',
             'roles' => [
-                'ROLE_USER'
-            ]
+                'ROLE_USER',
+            ],
         ]);
 
         self::assertResponseStatusCodeSame(403);

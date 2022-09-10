@@ -6,7 +6,6 @@ namespace App\DataFixtures;
 
 use App\Entity\HostedFile;
 use App\Entity\User;
-use DateTimeZone;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -21,6 +20,7 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
         $this->hostingDirectory = $hostingDirectory;
         $this->projectDirectory = $projectDirectory;
     }
+
     public function load(ObjectManager $manager): void
     {
         $users = $manager->getRepository(User::class)->findAll();
@@ -59,7 +59,7 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
                 'name' => $names[0],
                 'clientName' => 'test-cli-name'.$users[0]->getId().'.jpg',
                 'uploadDate' => new \DateTime('now'),
-                'expirationDate' => new \DateTime("2024-07-05T06:00:00Z", new DateTimeZone("Europe/Paris")),
+                'expirationDate' => new \DateTime('2024-07-05T06:00:00Z', new \DateTimeZone('Europe/Paris')),
                 'user' => $users[0],
                 'size' => 99191951951,
                 'scaned' => false,
@@ -69,13 +69,13 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
                 'uploadLocalisation' => '127.0.0.1',
                 'copyrightIssue' => false,
                 'conversionsAvailable' => 'jpg,png',
-                'virtualDirectory' => 'test-dir'.$users[0]->getId()
+                'virtualDirectory' => 'test-dir'.$users[0]->getId(),
             ],
             [
                 'name' => $names[1],
                 'clientName' => 'test'.$users[0]->getId().'.jpg',
                 'uploadDate' => new \DateTime('now'),
-                'expirationDate' => new \DateTime("2024-07-05T06:00:00Z", new DateTimeZone("Europe/Paris")),
+                'expirationDate' => new \DateTime('2024-07-05T06:00:00Z', new \DateTimeZone('Europe/Paris')),
                 'user' => $users[0],
                 'size' => 6516165161,
                 'scaned' => false,
@@ -85,13 +85,13 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
                 'uploadLocalisation' => '127.0.0.1',
                 'copyrightIssue' => false,
                 'conversionsAvailable' => 'jpg,png',
-                'virtualDirectory' => 'test-dir'.$users[0]->getId()
+                'virtualDirectory' => 'test-dir'.$users[0]->getId(),
             ],
             [
                 'name' => $names[2],
                 'clientName' => 'test-cli-name'.$users[1]->getId().'.jpg',
                 'uploadDate' => new \DateTime('now'),
-                'expirationDate' => new \DateTime("2024-07-05T06:00:00Z", new DateTimeZone("Europe/Paris")),
+                'expirationDate' => new \DateTime('2024-07-05T06:00:00Z', new \DateTimeZone('Europe/Paris')),
                 'user' => $users[1],
                 'size' => 99191951951,
                 'scaned' => false,
@@ -101,13 +101,13 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
                 'uploadLocalisation' => '127.0.0.1',
                 'copyrightIssue' => false,
                 'conversionsAvailable' => 'jpg,png',
-                'virtualDirectory' => 'test-dir'.$users[1]->getId()
+                'virtualDirectory' => 'test-dir'.$users[1]->getId(),
             ],
             [
                 'name' => $names[3],
                 'clientName' => 'test'.$users[1]->getId().'.jpg',
                 'uploadDate' => new \DateTime('now'),
-                'expirationDate' => new \DateTime("2024-07-05T06:00:00Z", new DateTimeZone("Europe/Paris")),
+                'expirationDate' => new \DateTime('2024-07-05T06:00:00Z', new \DateTimeZone('Europe/Paris')),
                 'user' => $users[1],
                 'size' => 6516165161,
                 'scaned' => false,
@@ -117,7 +117,7 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
                 'uploadLocalisation' => '127.0.0.1',
                 'copyrightIssue' => false,
                 'conversionsAvailable' => 'jpg,png',
-                'virtualDirectory' => 'test-dir'.$users[1]->getId()
+                'virtualDirectory' => 'test-dir'.$users[1]->getId(),
             ],
         ];
 

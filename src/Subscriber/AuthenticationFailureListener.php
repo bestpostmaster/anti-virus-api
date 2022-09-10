@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Subscriber;
 
 use App\Entity\Flood;
-use App\Repository\FloodRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationFailureEvent;
 
@@ -18,9 +17,6 @@ class AuthenticationFailureListener
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param AuthenticationFailureEvent $event
-     */
     public function onAuthenticationFailureResponse(AuthenticationFailureEvent $event): void
     {
         $this->removeOldFloods();
@@ -45,7 +41,7 @@ class AuthenticationFailureListener
     {
         $manager = $this->doctrine->getManager();
         $floodRepository = $manager->getRepository(Flood::class);
-        $floodRepository -> removeOldFloods();
+        $floodRepository->removeOldFloods();
         $manager->flush();
     }
 

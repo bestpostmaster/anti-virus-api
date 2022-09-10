@@ -68,5 +68,9 @@ php bin/console doctrine:migrations:migrate
 
 Run php-cs-fixer
 -------------------------------------------------------------------
-bin/php-cs-fixer fix tests && bin/php-cs-fixer fix src
+bin/php-cs-fixer fix tests --allow-risky=yes && bin/php-cs-fixer fix src --allow-risky=yes
+
+Run php-stan
+-------------------------------------------------------------------
+vendor/bin/phpstan analyse src tests
 

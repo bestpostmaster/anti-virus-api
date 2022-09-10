@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FloodRepository;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=FloodRepository::class)
@@ -34,17 +34,11 @@ class Flood
      */
     private $lastTry = '0';
 
-    /**
-     * @return string
-     */
     public function getIp(): string
     {
         return $this->ip;
     }
 
-    /**
-     * @param string $ip
-     */
     public function setIp(string $ip): void
     {
         $this->ip = $ip;

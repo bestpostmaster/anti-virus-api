@@ -12,12 +12,12 @@ class FailedMessageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            WorkerMessageFailedEvent::class => 'onMessageFailed'
+            WorkerMessageFailedEvent::class => 'onMessageFailed',
         ];
     }
 
     public function onMessageFailed(WorkerMessageFailedEvent $event)
     {
-        //$message = $event->getEnvelope()->getMessage();
+        // $message = $event->getEnvelope()->getMessage();
     }
 }

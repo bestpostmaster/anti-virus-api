@@ -16,7 +16,7 @@ class StatusController extends AbstractController
      */
     public function getStatus(UserRepository $userRepository): Response
     {
-        $admin = $userRepository->findOneBy(['login'=>'admin']);
+        $admin = $userRepository->findOneBy(['login' => 'admin']);
 
         if (!$admin) {
             return new Response('ko');

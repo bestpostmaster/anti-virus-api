@@ -37,6 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @var string The hashed password
+     *
      * @ORM\Column(type="string")
      */
     private $password;
@@ -101,14 +102,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $dateOfBirth;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    /** @ORM\Column(type="boolean", nullable=true) */
     private $isBanned = false;
 
-    /**
-     * @ORM\OneToMany(targetEntity=HostedFile::class, mappedBy="user")
-     */
+    /** @ORM\OneToMany(targetEntity=HostedFile::class, mappedBy="user") */
     private $files;
 
     /**
@@ -134,161 +131,101 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->login;
     }
 
-    /**
-     * @return string
-     */
     public function getEmail(): string
     {
         return $this->email;
     }
 
-    /**
-     * @param string $email
-     */
     public function setEmail(string $email): void
     {
         $this->email = strtolower($email);
     }
 
-    /**
-     * @return string
-     */
     public function getPhoneNumber(): string
     {
         return $this->phoneNumber;
     }
 
-    /**
-     * @param string $phoneNumber
-     */
     public function setPhoneNumber(string $phoneNumber): void
     {
         $this->phoneNumber = $phoneNumber;
     }
 
-    /**
-     * @return string
-     */
     public function getCity(): string
     {
         return $this->city;
     }
 
-    /**
-     * @param string $city
-     */
     public function setCity(string $city): void
     {
         $this->city = $city;
     }
 
-    /**
-     * @return string
-     */
     public function getCountry(): string
     {
         return $this->country;
     }
 
-    /**
-     * @param string $country
-     */
     public function setCountry(string $country): void
     {
         $this->country = $country;
     }
 
-    /**
-     * @return string
-     */
     public function getZipCode(): string
     {
         return $this->zipCode;
     }
 
-    /**
-     * @param string $zipCode
-     */
     public function setZipCode(string $zipCode): void
     {
         $this->zipCode = $zipCode;
     }
 
-    /**
-     * @return string
-     */
     public function getPreferredLanguage(): string
     {
         return $this->preferredLanguage;
     }
 
-    /**
-     * @param string $preferredLanguage
-     */
     public function setPreferredLanguage(string $preferredLanguage): void
     {
         $this->preferredLanguage = $preferredLanguage;
     }
 
-    /**
-     * @return string
-     */
     public function getTypeOfAccount(): string
     {
         return $this->typeOfAccount;
     }
 
-    /**
-     * @param string $typeOfAccount
-     */
     public function setTypeOfAccount(string $typeOfAccount): void
     {
         $this->typeOfAccount = $typeOfAccount;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     */
     public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
-    /**
-     * @return string
-     */
     public function getAvatarPicture(): string
     {
         return $this->avatarPicture;
     }
 
-    /**
-     * @param string $avatarPicture
-     */
     public function setAvatarPicture(string $avatarPicture): void
     {
         $this->avatarPicture = $avatarPicture;
     }
 
-    /**
-     * @return string
-     */
     public function getDateOfBirth(): string
     {
         return $this->dateOfBirth;
     }
 
-    /**
-     * @param string $dateOfBirth
-     */
     public function setDateOfBirth(string $dateOfBirth): void
     {
         $this->dateOfBirth = $dateOfBirth;
@@ -310,49 +247,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isBanned = $isBanned;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
     public function getRegistrationDate(): \DateTimeInterface
     {
         return $this->registrationDate;
     }
 
-    /**
-     * @param \DateTimeInterface $registrationDate
-     */
     public function setRegistrationDate(\DateTimeInterface $registrationDate): void
     {
         $this->registrationDate = $registrationDate;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
     public function getLastConnexionDate(): \DateTimeInterface
     {
         return $this->lastConnexionDate;
     }
 
-    /**
-     * @param \DateTimeInterface $lastConnexionDate
-     */
     public function setLastConnexionDate(\DateTimeInterface $lastConnexionDate): void
     {
         $this->lastConnexionDate = $lastConnexionDate;
     }
 
-    /**
-     * @return string
-     */
     public function getSecretTokenForValidation(): string
     {
         return $this->secretTokenForValidation;
     }
 
-    /**
-     * @param string $secretTokenForValidation
-     */
     public function setSecretTokenForValidation(string $secretTokenForValidation): void
     {
         $this->secretTokenForValidation = $secretTokenForValidation;

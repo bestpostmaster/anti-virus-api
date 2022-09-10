@@ -59,7 +59,7 @@ class FloodRepository extends ServiceEntityRepository
         $currentTime = time();
         $queryBuilder = $this->createQueryBuilder('flood')
             ->delete()
-            ->where("flood.lastTry + :timeLimit < :currentTime")
+            ->where('flood.lastTry + :timeLimit < :currentTime')
             ->setParameter('currentTime', $currentTime)
             ->setParameter('timeLimit', $timeLimit)
         ;
@@ -67,7 +67,7 @@ class FloodRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->execute();
     }
 
-    //removeOldFloods
+    // removeOldFloods
 
     // /**
     //  * @return Flood[] Returns an array of Flood objects

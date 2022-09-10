@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Repository\HostedFileRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -28,7 +27,7 @@ class FilesControllerTest extends WebTestCase
     {
         $userRepository = static::getContainer()->get(UserRepository::class);
 
-        $admin = $userRepository->findOneBy(['login' =>'admin']);
+        $admin = $userRepository->findOneBy(['login' => 'admin']);
 
         $this->client->loginUser($admin);
 
@@ -50,17 +49,17 @@ class FilesControllerTest extends WebTestCase
             '/api/files/upload',
             ['description' => 'My awesome image!'],
             [
-                'file' => $uploadedFile
+                'file' => $uploadedFile,
             ]
         );
 
         rename($fullFilePath.'.tmp', $fullFilePath);
 
-        $responseData = json_decode(($this->client->getResponse())->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $responseData = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertResponseIsSuccessful();
         self::assertSame($responseData['description'], 'My awesome image!');
         self::assertTrue(file_exists($this->hostingDirectory.$responseData['name']));
-        self::assertTrue($responseData['size'] === round(filesize($this->hostingDirectory.$responseData['name'])/1000000, 4));
+        self::assertTrue($responseData['size'] === round(filesize($this->hostingDirectory.$responseData['name']) / 1000000, 4));
     }
 }
