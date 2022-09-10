@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\HostedFileRepository;
@@ -206,12 +208,12 @@ class HostedFile
         return $this;
     }
 
-    public function getDownloadCounter(): ?string
+    public function getDownloadCounter(): ?int
     {
         return $this->downloadCounter;
     }
 
-    public function setDownloadCounter(string $downloadCounter): self
+    public function setDownloadCounter(int $downloadCounter): self
     {
         $this->downloadCounter = $downloadCounter;
 

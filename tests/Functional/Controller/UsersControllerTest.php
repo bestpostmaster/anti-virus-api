@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Controller;
 
 use App\Repository\UserRepository;
@@ -35,7 +37,7 @@ class UsersControllerTest extends WebTestCase
 
         $this->client->loginUser($admin);
 
-        $login = uniqid(mt_rand(), true);
+        $login = uniqid((string)mt_rand(), true);
 
         $this->client->jsonRequest('POST', '/api/admin/users/add', [
             'username' => $login,
@@ -60,7 +62,7 @@ class UsersControllerTest extends WebTestCase
         $this->client->loginUser($admin);
 
         $this->client->jsonRequest('POST', '/api/admin/users/add', [
-            'username' => uniqid(mt_rand(), true),
+            'username' => uniqid((string)mt_rand(), true),
             'password' => '5g4h6fghf6ghfh65fgh46',
             'roles' => [
                 'ROLE_USER'

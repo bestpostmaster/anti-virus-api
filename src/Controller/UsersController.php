@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\User;
@@ -89,7 +91,7 @@ class UsersController extends AbstractController
         $user->setLogin($data->username);
         $user->setRoles($data->roles);
         $user->setRegistrationDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-        $user->setSecretTokenForValidation(md5(uniqid(mt_rand(), true)).md5(uniqid(mt_rand(), true)));
+        $user->setSecretTokenForValidation(md5(uniqid((string)mt_rand(), true)).md5(uniqid((string)mt_rand(), true)));
         $user->setPassword($this->passwordEncoder->hashPassword($user,
             $data->password
         ));

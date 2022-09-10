@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\HostedFile;
@@ -61,7 +63,7 @@ class FilesController extends AbstractController
             throw new \Exception('No user logged in');
         }
 
-        $name = md5(uniqid(mt_rand(), true)).'.'.strtolower($receivedFile->getClientOriginalExtension());
+        $name = md5(uniqid((string)mt_rand(), true)).'.'.strtolower($receivedFile->getClientOriginalExtension());
         $receivedFile->move($this->hostingDirectory, $name);
 
         if (!file_exists($this->hostingDirectory.$name)) {
@@ -85,7 +87,7 @@ class FilesController extends AbstractController
         $file->setDescription($request->get("description") ?? $receivedFile->getClientOriginalName());
         $file->setFilePassword($request->get("filePassword") ?? '');
         $file->setDownloadCounter(0);
-        $file->setUrl(md5(uniqid(mt_rand(), true)).md5(uniqid(mt_rand(), true)));
+        $file->setUrl(md5(uniqid((string)mt_rand(), true)).md5(uniqid((string)mt_rand(), true)));
         $file->setUploadLocalisation($_SERVER['REMOTE_ADDR'] ?? '');
         $file->setCopyrightIssue(false);
         $file->setConversionsAvailable('');
