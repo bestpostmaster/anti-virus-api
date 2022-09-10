@@ -45,7 +45,10 @@ class FilesControllerTest extends WebTestCase
         // Attention, the fixtures file is deleted, it must be secured before uploading
         copy($fullFilePath, $fullFilePath.'.tmp');
 
-        $this->client->request('POST', '/api/files/upload', ['description' => 'My awesome image!'],
+        $this->client->request(
+            'POST',
+            '/api/files/upload',
+            ['description' => 'My awesome image!'],
             [
                 'file' => $uploadedFile
             ]
@@ -57,7 +60,7 @@ class FilesControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSame($responseData['description'], 'My awesome image!');
-        self::assertTrue(file_exists(            $this->hostingDirectory.$responseData['name']));
+        self::assertTrue(file_exists($this->hostingDirectory.$responseData['name']));
         self::assertTrue($responseData['size'] === round(filesize($this->hostingDirectory.$responseData['name'])/1000000, 4));
     }
 }

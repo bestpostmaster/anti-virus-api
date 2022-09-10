@@ -17,7 +17,9 @@
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache
-###< phpunit/phpunit ###
+
+###> php-cs-fixer ###
+.php-cs-fixer.cache
 
 ###< VAULT secrets ###
 /config/secrets/dev/

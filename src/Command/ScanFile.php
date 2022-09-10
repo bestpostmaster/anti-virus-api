@@ -52,7 +52,6 @@ class ScanFile extends Command
         $fullPath = $this->projectDirectory.$this->hostingDirectory.$input->getArgument('f');
 
         if (!file_exists($fullPath)) {
-
             $output->writeln([
                 '<!!!> This file does not exist : '.$fullPath,
                 '==========================================================================',

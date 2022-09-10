@@ -26,7 +26,7 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
         $users = $manager->getRepository(User::class)->findAll();
         $files = $this->getFilesFixturesFromUsers($users);
 
-        foreach($files as $item) {
+        foreach ($files as $item) {
             $file = new HostedFile();
             $file->setName($item['name']);
             $file->setClientName($item['clientName']);
@@ -48,7 +48,7 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
         }
     }
 
-    private function getFilesFixturesFromUsers(array $users):array
+    private function getFilesFixturesFromUsers(array $users): array
     {
         $names = $this->getFilesNames();
 
@@ -124,7 +124,8 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
         return $files;
     }
 
-    public function getFilesNames(): array {
+    public function getFilesNames(): array
+    {
         return [
             '5fg4h61h6dfh65f6fgh6fh6fgh46fg6d5f.jpg',
             '54hd6f5h6dfg5h4d6fgh6fdg5h65fz6rd6f5gh.png',
@@ -133,8 +134,8 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
         ];
     }
 
-    public function copyFilesFixtures(): void {
-
+    public function copyFilesFixtures(): void
+    {
         if (!is_dir($this->hostingDirectory)) {
             if (!mkdir($concurrentDirectory = $this->hostingDirectory) && !is_dir($concurrentDirectory)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));

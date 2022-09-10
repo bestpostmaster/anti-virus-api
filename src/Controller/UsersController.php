@@ -41,12 +41,12 @@ class UsersController extends AbstractController
      */
     public function getUserInfos(Request $request, UserRepository $userRepository): Response
     {
-        if(!$this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
             throw new \Exception('Admin only !');
         }
 
         $result = $userRepository->findOneBy(['id'=>$request->get('userId')]);
-        if(!$result) {
+        if (!$result) {
             throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
         }
 
@@ -59,12 +59,12 @@ class UsersController extends AbstractController
      */
     public function editUserInfos(Request $request, UserRepository $userRepository, ManagerRegistry $doctrine): Response
     {
-        if(!$this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
             throw new \Exception('Admin only !');
         }
 
         $user = $userRepository->findOneBy(['id'=>$request->get('userId')]);
-        if(!$user) {
+        if (!$user) {
             throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
         }
 
@@ -81,7 +81,7 @@ class UsersController extends AbstractController
      */
     public function add(Request $request, ManagerRegistry $doctrine): Response
     {
-        if(!$this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
             throw new \Exception('Admin only !');
         }
 
@@ -92,7 +92,8 @@ class UsersController extends AbstractController
         $user->setRoles($data->roles);
         $user->setRegistrationDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $user->setSecretTokenForValidation(md5(uniqid((string)mt_rand(), true)).md5(uniqid((string)mt_rand(), true)));
-        $user->setPassword($this->passwordEncoder->hashPassword($user,
+        $user->setPassword($this->passwordEncoder->hashPassword(
+            $user,
             $data->password
         ));
 
@@ -115,7 +116,8 @@ class UsersController extends AbstractController
         empty($data['login']) ? true : $user->setLogin($data['login']);
         empty($data['roles']) ? true : $user->setRoles($data['roles']);
 
-        empty($data['password']) ? true : $user->setPassword($this->passwordEncoder->hashPassword($user,
+        empty($data['password']) ? true : $user->setPassword($this->passwordEncoder->hashPassword(
+            $user,
             $data['password']
         ));
 

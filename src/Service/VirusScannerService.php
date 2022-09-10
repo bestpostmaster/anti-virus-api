@@ -22,7 +22,7 @@ class VirusScannerService
         $this->projectDirectory = $projectDirectory;
     }
 
-    public function scan(HostedFile $hostedFile):void
+    public function scan(HostedFile $hostedFile): void
     {
         if (!is_dir($this->quarantineDirectory)) {
             mkdir($this->quarantineDirectory);

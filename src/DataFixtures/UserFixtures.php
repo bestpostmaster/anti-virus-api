@@ -13,16 +13,16 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture
 {
-     private UserPasswordHasherInterface $passwordEncoder;
+    private UserPasswordHasherInterface $passwordEncoder;
     private string $adminPassword;
     private string $defaultUserPassword;
 
-     public function __construct(UserPasswordHasherInterface $passwordEncoder, string $adminPassword, string $defaultUserPassword)
-     {
-         $this->passwordEncoder = $passwordEncoder;
-         $this->adminPassword = $adminPassword;
-         $this->defaultUserPassword = $defaultUserPassword;
-     }
+    public function __construct(UserPasswordHasherInterface $passwordEncoder, string $adminPassword, string $defaultUserPassword)
+    {
+        $this->passwordEncoder = $passwordEncoder;
+        $this->adminPassword = $adminPassword;
+        $this->defaultUserPassword = $defaultUserPassword;
+    }
 
     public function load(ObjectManager $manager): void
     {
@@ -39,11 +39,12 @@ class UserFixtures extends Fixture
             ]
         ];
 
-        foreach($users as $item) {
+        foreach ($users as $item) {
             $user = new User();
             $user->setLogin($item['login']);
             $user->setRoles($item['roles']);
-            $user->setPassword($this->passwordEncoder->hashPassword($user,
+            $user->setPassword($this->passwordEncoder->hashPassword(
+                $user,
                 $item['pass']
             ));
 

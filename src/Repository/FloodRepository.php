@@ -62,7 +62,7 @@ class FloodRepository extends ServiceEntityRepository
             ->where("flood.lastTry + :timeLimit < :currentTime")
             ->setParameter('currentTime', $currentTime)
             ->setParameter('timeLimit', $timeLimit)
-            ;
+        ;
 
         return $queryBuilder->getQuery()->execute();
     }

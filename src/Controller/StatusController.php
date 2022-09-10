@@ -18,7 +18,7 @@ class StatusController extends AbstractController
     {
         $admin = $userRepository->findOneBy(['login'=>'admin']);
 
-        if(!$admin) {
+        if (!$admin) {
             return new Response('ko');
         }
 

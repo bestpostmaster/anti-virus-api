@@ -30,7 +30,7 @@ class AuthenticationFailureListener
         $manager = $this->doctrine->getManager();
         $floodsByIp = $manager->getRepository(Flood::class)->findBy(['ip' => $ip]);
 
-        if($floodsByIp && count($floodsByIp) > $maxTryInTenSeconds) {
+        if ($floodsByIp && count($floodsByIp) > $maxTryInTenSeconds) {
             throw new \Exception('Please dont spam our server! ');
         }
 

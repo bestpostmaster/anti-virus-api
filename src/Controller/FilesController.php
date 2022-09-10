@@ -39,7 +39,7 @@ class FilesController extends AbstractController
         $userId = ($this->getUser())->getId();
         $this->hostingDirectory = $hostingDirectory;
 
-        if($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
             return $this->json($hostedFileRepository->findAll(), 200, [], ['groups' => 'file:read']);
         }
 
@@ -59,7 +59,7 @@ class FilesController extends AbstractController
         $receivedFile = ($request->files)->get("file");
         $logger->info('Try to upload file : '.$receivedFile->getClientOriginalName());
 
-        if(!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
         }
 
@@ -115,23 +115,22 @@ class FilesController extends AbstractController
         $userId = ($this->getUser())->getId();
         $url = $request->get("url");
 
-        if(!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
         }
 
-        if($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
             $result = $hostedFileRepository->findOneBy(['url' => $url]);
-        }
-        else {
+        } else {
             $result = $hostedFileRepository->findOneBy(['url' => $url, 'user' => $userId]);
         }
 
-        if(!$result) {
+        if (!$result) {
             throw $this->createNotFoundException('The file does not exist');
         }
 
         $response = new BinaryFileResponse($this->hostingDirectory.$result->getName());
-        $extension = (explode('.',$result->getName()))[1] ?? '';
+        $extension = (explode('.', $result->getName()))[1] ?? '';
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             $result->getDescription().'.'.$extension
@@ -153,18 +152,17 @@ class FilesController extends AbstractController
         $userId = ($this->getUser())->getId();
         $id = $request->get("fileId");
 
-        if(!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
         }
 
-        if($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
             $result = $hostedFileRepository->findOneBy(['id' => $id]);
-        }
-        else {
+        } else {
             $result = $hostedFileRepository->findOneBy(['id' => $id, 'user' => $userId]);
         }
 
-        if(!$result) {
+        if (!$result) {
             throw $this->createNotFoundException('The file does not exist');
         }
 
@@ -179,18 +177,17 @@ class FilesController extends AbstractController
         $userId = ($this->getUser())->getId();
         $id = $request->get("fileId");
 
-        if(!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
         }
 
-        if($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
             $result = $hostedFileRepository->findOneBy(['id' => $id]);
-        }
-        else {
+        } else {
             $result = $hostedFileRepository->findOneBy(['id' => $id, 'user' => $userId]);
         }
 
-        if(!$result) {
+        if (!$result) {
             throw $this->createNotFoundException('The file does not exist');
         }
 
@@ -201,7 +198,7 @@ class FilesController extends AbstractController
 
         $fullPath = $this->hostingDirectory.$result->getName();
 
-        if(file_exists($fullPath)) {
+        if (file_exists($fullPath)) {
             unlink($this->hostingDirectory . $result->getName());
         }
 
@@ -216,7 +213,7 @@ class FilesController extends AbstractController
      */
     public function convert(Request $request, Converter $converter): Response
     {
-        if(!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             throw new \Exception('No user logged in');
         }
 
@@ -228,16 +225,16 @@ class FilesController extends AbstractController
         return $this->json([], 200, [], ['groups' => 'file:read']);
     }
 
-    private function checkUserCanUpload(User $user, float $fileSize):bool
+    private function checkUserCanUpload(User $user, float $fileSize): bool
     {
-        if($fileSize + $user->getTotalSpaceUsedMo() > $user ->getAuthorizedSizeMo()) {
+        if ($fileSize + $user->getTotalSpaceUsedMo() > $user ->getAuthorizedSizeMo()) {
             throw new Exception('not enough storage space');
         }
 
         return true;
     }
 
-    private function increaseUserSpace(User $user, float $sizeToAdd):void
+    private function increaseUserSpace(User $user, float $sizeToAdd): void
     {
         $manager = $this->doctrine->getManager();
         $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo()+$sizeToAdd);
@@ -245,7 +242,7 @@ class FilesController extends AbstractController
         $manager->flush($user);
     }
 
-    private function decreaseUserSpace(User $user, float $sizeToDeduct):void
+    private function decreaseUserSpace(User $user, float $sizeToDeduct): void
     {
         $manager = $this->doctrine->getManager();
         $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo()-$sizeToDeduct);

@@ -9,7 +9,6 @@ use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 
 class FailedMessageSubscriber implements EventSubscriberInterface
 {
-
     public static function getSubscribedEvents(): array
     {
         return [

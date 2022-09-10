@@ -66,3 +66,7 @@ After every entity modification use this command
 php bin/console doctrine:migrations:diff
 php bin/console doctrine:migrations:migrate
 
+Run php-cs-fixer
+-------------------------------------------------------------------
+bin/php-cs-fixer fix tests && bin/php-cs-fixer fix src
+

@@ -6,12 +6,12 @@ namespace App\Message;
 
 final class VirusScannerMessage
 {
-     private int $fileId;
+    private int $fileId;
 
-     public function __construct(int $fileId)
-     {
-         $this->fileId = $fileId;
-     }
+    public function __construct(int $fileId)
+    {
+        $this->fileId = $fileId;
+    }
 
     public function getFileId(): int
     {
