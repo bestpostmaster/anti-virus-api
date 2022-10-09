@@ -106,6 +106,34 @@ class UsersController extends AbstractController
     }
 
     /**
+     * @Route("/api/users/register", name="app_users_register")
+     */
+    public function registerFromFront(Request $request, ManagerRegistry $doctrine): Response
+    {
+        $data = json_decode($request->getContent());
+
+        $user = new User();
+        $user->setLogin($data->email);
+        $user->setEmail($data->email);
+        $user->setRoles([
+            "ROLE_USER"
+        ]);
+
+        $user->setRegistrationDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $user->setSecretTokenForValidation(md5(uniqid((string) mt_rand(), true)).md5(uniqid((string) mt_rand(), true)));
+        $user->setPassword($this->passwordEncoder->hashPassword(
+            $user,
+            $data->password1
+        ));
+
+        $manager = $doctrine->getManager();
+        $manager->persist($user);
+        $manager->flush($user);
+
+        return $this->json($user, 200, [], ['groups' => 'user:read']);
+    }
+
+    /**
      * @return void
      */
     public function hydrateUser(Request $request, User $user): User

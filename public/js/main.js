@@ -162,6 +162,79 @@ $(function() {
 	uploadForm();
 
 
+	var subscribeForm = function() {
+
+		if ($('#subscribeForm').length > 0 ) {
+			$( "#subscribeForm" ).validate( {
+				rules: {
+					password1: "required",
+					password2: {
+						required: true,
+						equalTo: "#password1"
+					},
+					email: {
+						required: true,
+						email: true
+					}
+				},
+				messages: {
+					email: {
+						required: "Please enter a valid email address",
+						email: "Please enter a valid email address",
+					},
+					password1: "Please enter your password",
+					password2: {
+						required: "Please enter your password",
+						equalTo: "Please enter the same password as above"
+					},
+				},
+				/* submit via ajax */
+				submitHandler: function(form) {
+					var $submit = $('.submitting'),
+						waitText = 'Submitting...';
+
+					$('#form-message-warning').html("");
+
+					$.ajax({
+						type: "POST",
+						url: "api/users/register",
+						contentType: "application/json",
+						dataType: "json",
+						data: JSON.stringify(getFormData($(form))),
+
+						beforeSend: function() {
+							$submit.css('display', 'block').text(waitText);
+						},
+						success: function(msg) {
+							if (msg && msg.totalSpaceUsedMo === 0) {
+								$('#form-message-warning').hide();
+								setTimeout(function(){
+									$('#subscribeForm').fadeOut();
+								}, 1000);
+								setTimeout(function(){
+									$('#form-message-success').fadeIn();
+								}, 1400);
+								$submit.css('display', 'none');
+							} else {
+								$('#form-message-warning').html(msg);
+								$('#form-message-warning').fadeIn();
+								$submit.css('display', 'none');
+							}
+						},
+						error: function() {
+							$('#form-message-warning').html("Something went wrong. Please try again.");
+							$('#form-message-warning').fadeIn();
+							$submit.css('display', 'none');
+						}
+					});
+				}
+
+			} );
+		}
+	};
+	subscribeForm();
+
+
 	$('#uploadAnotherFile').click(function() {
 		$('#form-message-warning').hide();
 		setTimeout(function(){

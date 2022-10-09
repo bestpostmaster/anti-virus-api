@@ -105,6 +105,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /** @ORM\Column(type="boolean", nullable=true) */
     private $isBanned = false;
 
+    /** @ORM\Column(type="boolean", nullable=true, options={"default" : false}) */
+    private bool $emailConfirmed = false;
+
     /** @ORM\OneToMany(targetEntity=HostedFile::class, mappedBy="user") */
     private $files;
 
@@ -396,5 +399,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+
+    public function isEmailConfirmed(): bool
+    {
+        return $this->emailConfirmed;
+    }
+
+    public function setEmailConfirmed(bool $emailConfirmed): void
+    {
+        $this->emailConfirmed = $emailConfirmed;
     }
 }
