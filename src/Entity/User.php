@@ -401,7 +401,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-
     public function isEmailConfirmed(): bool
     {
         return $this->emailConfirmed;

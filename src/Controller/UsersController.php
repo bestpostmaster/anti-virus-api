@@ -116,7 +116,7 @@ class UsersController extends AbstractController
         $user->setLogin($data->email);
         $user->setEmail($data->email);
         $user->setRoles([
-            "ROLE_USER"
+            'ROLE_USER',
         ]);
 
         $user->setRegistrationDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));

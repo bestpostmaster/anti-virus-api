@@ -34,7 +34,7 @@ class VirusScannerService
         $logPath = $this->projectDirectory.$varLog.$hostedFile->getName().'-ScanResult.log';
         exec('clamscan -r --move='.$this->quarantineDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$logPath);
 
-        if(!file_exists($logPath)) {
+        if (!file_exists($logPath)) {
             throw new \RuntimeException(sprintf('Please check AntiVirus installation : '.$logPath.' command : '.'clamscan -r --move='.$this->quarantineDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$logPath));
         }
 
