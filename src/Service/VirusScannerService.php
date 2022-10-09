@@ -25,12 +25,21 @@ class VirusScannerService
     public function scan(HostedFile $hostedFile): void
     {
         if (!is_dir($this->quarantineDirectory)) {
-            mkdir($this->quarantineDirectory);
+            if (!mkdir($concurrentDirectory = $this->quarantineDirectory) && !is_dir($concurrentDirectory)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+            }
         }
 
-        exec('clamscan -r --move='.$this->quarantineDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$this->projectDirectory.'/var/log/'.$hostedFile->getName().'-ScanResult.log');
-        $scanResult = file_get_contents($this->projectDirectory.'/var/log/'.$hostedFile->getName().'-ScanResult.log');
-        $scanResult = str_replace($this->projectDirectory.'/var/log/', '', $scanResult);
+        $varLog = DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR;
+        $logPath = $this->projectDirectory.$varLog.$hostedFile->getName().'-ScanResult.log';
+        exec('clamscan -r --move='.$this->quarantineDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$logPath);
+
+        if(!file_exists($logPath)) {
+            throw new \RuntimeException(sprintf('Please check AntiVirus installation : '.$logPath.' command : '.'clamscan -r --move='.$this->quarantineDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$logPath));
+        }
+
+        $scanResult = file_get_contents($this->projectDirectory.$varLog.$hostedFile->getName().'-ScanResult.log');
+        $scanResult = str_replace($this->projectDirectory.$varLog, '', $scanResult);
         $scanResult = str_replace($this->quarantineDirectory, '/quarantine/', $scanResult);
         $scanResult = str_replace($this->hostingDirectory, '/', $scanResult);
         $scanResult = str_replace($hostedFile->getName(), $hostedFile->getClientName(), $scanResult);

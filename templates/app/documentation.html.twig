@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700,900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="fonts/icomoon/style.css">
+
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- Style -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>Documentation, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
+    <meta name="description" content="Documentation, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
+</head>
+<body>
+
+
+<div class="content">
+
+    <div class="container">
+
+
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+
+                <div class="row align-items-center">
+                    <div class="col-lg-7 mb-5 mb-lg-0">
+
+                        <h2 class="mb-5">Documentation</h2>
+
+                        <div class="row">
+                            <div class="col-md-12 form-group">
+                                <b>This API is simple to use. You just have to follow these steps</b><br><br>
+
+                                <ul>
+                                    <li>Create a free account</li>
+                                    <li>Click on the link you receive by email to confirm your address</li>
+                                    <li>Generate a token with credentials</li>
+
+                                    <p>You can use any language to make this CURL call. (Python, PHP, Java, JavaScript...)</p>
+
+                                    <textarea class="codeBlock" rows="8">curl --location --request POST 'http://anti-virus-api.com/api/login_check' \
+                                        --header 'Content-Type: application/json' \
+                                        --data-raw '{"username":"YOUR-LOGIN","password":"YOUR-PASSWORD"}'
+                                    </textarea> <br>
+
+                                    If your credentials are correct, our server will provide you with a token as a response :
+                                    <textarea class="codeBlock" rows="8">{"token":"ayJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2NjUzMDY2ODgsImV4cCI6MTY2NTM5MzA4OCwicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfVVNFUiJdLCJ1c2VybmFtZSI6ImFkbWluIn0.Ms_P48dmq0ppe0Rk6NGDUEBy_eNaYU5ksVdsjjQ-G4OPNYFyTnKSfGVuAic1T4GIMrvcU8MG86MHmDOUoCkD4d6PFJspJj0B5SB0U4d_EuauSvT0bJuNAaAKnd30E--lFZTI-UVCj0OeteV9MbFTKhZ4-dna1mbf4EDCfsRUAywVO_mxhvRzWPrVNgz1xvkQ-bS3Wy0f9kBKZVFu9TGvKh6_5rGNkmaxrR4ICLG5M_J1WSNNykjoDZlHkmtcnTIF_uVkp1bvG9mY653KB4pmRdAulVGicus_sXKflIKMBnN90tQOSVlG2PihrEFV_EWxt1Q1nUSGZ6_Fe6ByGANVeb"}
+                                    </textarea> <br>
+
+                                    <br>
+                                    <li>Use the token to upload the file on our server </li>
+
+                                    <textarea class="codeBlock" rows="16">curl --location --request POST 'http://anti-virus-api.local.com/api/files/upload' \
+                                        --header 'Authorization: Bearer ayJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.ayJpYXQiOjE2NjUzMDY2ODgsImV4cCI6MTY2NTM5MzA4OCwicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfVVNFUiJdLCJ1c2VybmFtZSI6ImFkbWluIn0.Ms_P48dmq0ppe0Rk6NGDUEBy_eNaYU5ksVdsjjQ-G4OPNYFyTnKSfGVuAic1T4GIMrvcU8MG86MHmDOUoCkD4d6PFJspJj0B5SB0U4d_EuauSvT0bJuNAaAKnd30E--lFZTI-UVCj0OeteV9MbFTKhZ4-dna1mbf4EDCfsRUAywVO_mxhvRzWPrVNgz1xvkQ-bS3Wy0f9kBKZVFu9TGvKh6_5rGNkmaxrR4ICLG5M_J1WSNNykjoDZlHkmtcnTIF_uVkp1bvG9mY653KB4pmRdAulVGicus_sXKflIKMBnN90tQOSVlG2PihrEFV_EWxt1Q1nUSGZ6_Fe6ByGANVeb' \
+                                        --form 'file=@"file.pdf"' \
+                                        --form 'description="My awesome file"'
+                                    </textarea>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 ml-auto">
+                        <p><a href="#">Home page</a></p>
+                        <p><a href="#">Create an account for free</a></p>
+                        <p><a href="#">JSON Web Token</a></p>
+                        <p><a href="#">Terms of use</a></p>
+                        <p><a href="#">Cookies and personal data</a></p>
+                        <p><a href="#">Contact us</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery.validate.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -73,3 +73,9 @@ label.error {
   font-weight: bold;
   font-size: 12px;
   color: #000; }
+
+.codeBlock {
+  height: auto;
+  width: 95%;
+  background-color: #dddddd;
+}

@@ -49,7 +49,7 @@ php bin/console doctrine:fixtures:load
 JSON Collection for Postman
 
 Run Worker to consume messages :
-php bin/console messenger:consume async -vv
+php bin/console messenger:consume scan -vv
 
 -------------------------------------------------------------------
 https://www.postman.com/collections/880b957ed4b9cdded6bf
@@ -74,4 +74,11 @@ bin/php-cs-fixer fix tests --allow-risky=yes && bin/php-cs-fixer fix src --allow
 Run php-stan
 -------------------------------------------------------------------
 vendor/bin/phpstan analyse src tests
+
+Simulate ClamAV On Windows :
+-------------------------------------------------------------------
+#C:\scripts\clamscan.bat
+touch %4%
+
+and add C:\scripts\ to ENV variables
 
