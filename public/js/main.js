@@ -235,6 +235,78 @@ $(function() {
 	subscribeForm();
 
 
+	var contactForm = function() {
+
+		if ($('#contactForm').length > 0 ) {
+			$( "#contactForm" ).validate( {
+				rules: {
+					email: {
+						required: true,
+						email: true
+					},
+					message: "required",
+					response1: {
+						required: true
+					},
+					response2: {
+						required: true
+					},
+				},
+				messages: {
+					email: {
+						required: "Please enter a valid email address",
+						email: "Please enter a valid email address",
+					},
+					response1: "Please calculate the requested sum and give the result (numbers)",
+					response2: "Please calculate the requested sum and give the result (numbers)",
+				},
+				/* submit via ajax */
+				submitHandler: function(form) {
+					var $submit = $('.submitting'),
+						waitText = 'Submitting...';
+
+					$('#form-message-warning').html("");
+
+					$.ajax({
+						type: "POST",
+						url: "send-contact-message",
+						contentType: "application/json",
+						dataType: "json",
+						data: JSON.stringify(getFormData($(form))),
+
+						beforeSend: function() {
+							$submit.css('display', 'block').text(waitText);
+						},
+						success: function(msg) {
+							if (msg && msg.confirmation === 'ok') {
+								$('#form-message-warning').hide();
+								setTimeout(function(){
+									$('#contactForm').fadeOut();
+								}, 1000);
+								setTimeout(function(){
+									$('#form-message-success').fadeIn();
+								}, 1400);
+								$submit.css('display', 'none');
+							} else {
+								$('#form-message-warning').html(msg);
+								$('#form-message-warning').fadeIn();
+								$submit.css('display', 'none');
+							}
+						},
+						error: function() {
+							$('#form-message-warning').html("Something went wrong. Please try again.");
+							$('#form-message-warning').fadeIn();
+							$submit.css('display', 'none');
+						}
+					});
+				}
+
+			} );
+		}
+	};
+	contactForm();
+
+
 	$('#uploadAnotherFile').click(function() {
 		$('#form-message-warning').hide();
 		setTimeout(function(){

@@ -16,6 +16,11 @@ services:
             $quarantineDirectory: '%env(resolve:QUARANTINE_DIRECTORY)%'
             $adminPassword: '%env(resolve:ADMIN_PASSWORD)%'
             $defaultUserPassword: '%env(resolve:DEFAULT_USER_PASSWORD)%'
+            $webSiteProtocol: '%env(WEB_SITE_PROTOCOL)%'
+            $webSiteName: '%env(resolve:WEB_SITE_NAME)%'
+            $webSiteDomainName: '%env(resolve:WEB_SITE_DOMAIN_NAME)%'
+            $webSiteHostUrl: '%env(resolve:WEB_SITE_HOME_URL)%'
+            $webSiteEmailAddress: '%env(resolve:WEB_SITE_EMAIL_ADDRESS)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

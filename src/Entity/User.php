@@ -129,6 +129,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private \DateTimeInterface $registrationDate;
 
+    /**
+     * @ORM\Column(type="datetime", length=60, nullable=true)
+     * @groups("user:read", "file:read")
+     */
+    private \DateTimeInterface $lastConnexionDate;
+
+    /** @ORM\Column(type="string", nullable=true) */
+    private string $secretTokenForValidation;
+
     public function getUserIdentifier(): string
     {
         return $this->login;
@@ -279,10 +288,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->secretTokenForValidation = $secretTokenForValidation;
     }
-
-    private \DateTimeInterface $lastConnexionDate;
-
-    private string $secretTokenForValidation;
 
     public function getTotalSpaceUsedMo(): float
     {

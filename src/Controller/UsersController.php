@@ -10,6 +10,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -18,11 +20,19 @@ class UsersController extends AbstractController
 {
     private UserPasswordHasherInterface $passwordEncoder;
     private DenormalizerInterface $denormalizer;
+    private string $webSiteName;
+    private string $webSiteDomainName;
+    private string $webSiteHostUrl;
+    private string $webSiteEmailAddress;
 
-    public function __construct(UserPasswordHasherInterface $passwordEncoder, DenormalizerInterface $denormalizer)
+    public function __construct(UserPasswordHasherInterface $passwordEncoder, DenormalizerInterface $denormalizer, string $webSiteName, string $webSiteDomainName, string $webSiteHostUrl, string $webSiteEmailAddress)
     {
         $this->passwordEncoder = $passwordEncoder;
         $this->denormalizer = $denormalizer;
+        $this->webSiteName = $webSiteName;
+        $this->webSiteDomainName = $webSiteDomainName;
+        $this->webSiteHostUrl = $webSiteHostUrl;
+        $this->webSiteEmailAddress = $webSiteEmailAddress;
     }
 
     /**
@@ -78,6 +88,27 @@ class UsersController extends AbstractController
     }
 
     /**
+     * @Route("/api/users/confirm-email-address/{secret}", name="confirm_email_address")
+     */
+    public function confirmEmailAddress(Request $request, ManagerRegistry $doctrine, UserRepository $userRepository): Response
+    {
+        $user = $userRepository->findOneBy(['secretTokenForValidation' => $request->get('secret')]);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
+        }
+
+        $user->setEmailConfirmed(true);
+        $em = $doctrine->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        return $this->render('app/confirm-email.html.twig', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
      * @Route("/api/admin/users/add", name="app_users_add")
      */
     public function add(Request $request, ManagerRegistry $doctrine): Response
@@ -108,7 +139,7 @@ class UsersController extends AbstractController
     /**
      * @Route("/api/users/register", name="app_users_register")
      */
-    public function registerFromFront(Request $request, ManagerRegistry $doctrine): Response
+    public function registerFromFront(Request $request, ManagerRegistry $doctrine, MailerInterface $mailer): Response
     {
         $data = json_decode($request->getContent());
 
@@ -129,6 +160,21 @@ class UsersController extends AbstractController
         $manager = $doctrine->getManager();
         $manager->persist($user);
         $manager->flush($user);
+
+        $link = $this->webSiteHostUrl.'/api/users/confirm-email-address/'.$user->getSecretTokenForValidation();
+
+        $email = (new Email())
+            ->from($this->webSiteEmailAddress)
+            ->to($user->getEmail())
+            // ->cc('cc@example.com')
+            // ->bcc('bcc@example.com')
+            // ->replyTo('fabien@example.com')
+            // ->priority(Email::PRIORITY_HIGH)
+            ->subject('Activate your account')
+            ->text('To activate your account, visit this page : '.$link)
+            ->html('<p>To activate your account, click on this link:</p> <a href="'.$link.'">LINK</a>');
+
+        $mailer->send($email);
 
         return $this->json($user, 200, [], ['groups' => 'user:read']);
     }

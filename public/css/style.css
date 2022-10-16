@@ -60,7 +60,7 @@ label.error {
 #form-message-warning {
   color: #B90B0B; }
 
-#form-message-success, #form-upload-success {
+#form-message-success, #form-email-confirmed, #form-upload-success {
   color: #55A44E;
   font-size: 18px;
   font-weight: bold; }
