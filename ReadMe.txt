@@ -86,3 +86,11 @@ Check supervisor configuration :
 ------------------------------------------------------------------
 cat /etc/supervisor/conf.d/messenger-worker.conf
 
+
+AWS EC2 rights :
+------------------------------------------------------------------
+sudo chown -R www-data:www-data SYMFONY_DIRECTORY
+sudo usermod -a -G www-data admin
+sudo chmod -R 770 SYMFONY_DIRECTORY
+
+
