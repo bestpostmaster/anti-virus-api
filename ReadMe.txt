@@ -82,3 +82,7 @@ touch %4%
 
 and add C:\scripts\ to ENV variables
 
+Check supervisor configuration :
+------------------------------------------------------------------
+cat /etc/supervisor/conf.d/messenger-worker.conf
+
