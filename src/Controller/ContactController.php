@@ -19,16 +19,16 @@ class ContactController extends AbstractController
     private string $webSiteProtocol;
     private string $webSiteName;
     private string $webSiteDomainName;
-    private string $webSiteHostUrl;
+    private string $webSiteHomeUrl;
     private string $webSiteEmailAddress;
 
-    public function __construct(MailerInterface $mailer, string $webSiteProtocol, string $webSiteName, string $webSiteDomainName, string $webSiteHostUrl, string $webSiteEmailAddress)
+    public function __construct(MailerInterface $mailer, string $webSiteProtocol, string $webSiteName, string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress)
     {
         $this->mailer = $mailer;
         $this->webSiteProtocol = $webSiteProtocol;
         $this->webSiteName = $webSiteName;
         $this->webSiteDomainName = $webSiteDomainName;
-        $this->webSiteHostUrl = $webSiteHostUrl;
+        $this->webSiteHomeUrl = $webSiteHomeUrl;
         $this->webSiteEmailAddress = $webSiteEmailAddress;
     }
 

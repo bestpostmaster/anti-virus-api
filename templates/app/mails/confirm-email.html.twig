@@ -1,0 +1,14 @@
+{% include 'app/mails/header.html.twig' %}
+
+<p>Hello,<br>
+    You have signed up on <a href="{{ link }}">LINK</a>.<br>
+    To finish the activation, click on the following link. <br></p> <a href="{{ link }}">LINK</a><br><br>
+
+
+Your request will not be processed unless you confirm the address using this URL. This link expires 24 hours after your original verification request.<br><br>
+
+If you did NOT request to verify this email address, do not click on the link.<br>
+Sincerely,
+
+{% include 'app/mails/footer.html.twig' %}
+

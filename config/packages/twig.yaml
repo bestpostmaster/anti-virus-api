@@ -1,5 +1,11 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
+    globals:
+        webSiteProtocol: '%webSiteProtocol%'
+        webSiteName: '%webSiteName%'
+        webSiteDomainName: '%webSiteDomainName%'
+        webSiteHomeUrl: '%webSiteHomeUrl%'
+        webSiteEmailAddress: '%webSiteEmailAddress%'
 
 when@test:
     twig:

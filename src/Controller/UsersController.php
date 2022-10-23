@@ -7,11 +7,11 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -22,16 +22,16 @@ class UsersController extends AbstractController
     private DenormalizerInterface $denormalizer;
     private string $webSiteName;
     private string $webSiteDomainName;
-    private string $webSiteHostUrl;
+    private string $webSiteHomeUrl;
     private string $webSiteEmailAddress;
 
-    public function __construct(UserPasswordHasherInterface $passwordEncoder, DenormalizerInterface $denormalizer, string $webSiteName, string $webSiteDomainName, string $webSiteHostUrl, string $webSiteEmailAddress)
+    public function __construct(UserPasswordHasherInterface $passwordEncoder, DenormalizerInterface $denormalizer, string $webSiteName, string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress)
     {
         $this->passwordEncoder = $passwordEncoder;
         $this->denormalizer = $denormalizer;
         $this->webSiteName = $webSiteName;
         $this->webSiteDomainName = $webSiteDomainName;
-        $this->webSiteHostUrl = $webSiteHostUrl;
+        $this->webSiteHomeUrl = $webSiteHomeUrl;
         $this->webSiteEmailAddress = $webSiteEmailAddress;
     }
 
@@ -161,9 +161,9 @@ class UsersController extends AbstractController
         $manager->persist($user);
         $manager->flush($user);
 
-        $link = $this->webSiteHostUrl.'/api/users/confirm-email-address/'.$user->getSecretTokenForValidation();
+        $link = $this->webSiteHomeUrl.'/api/users/confirm-email-address/'.$user->getSecretTokenForValidation();
 
-        $email = (new Email())
+        $email = (new TemplatedEmail())
             ->from($this->webSiteEmailAddress)
             ->to($user->getEmail())
             // ->cc('cc@example.com')
@@ -171,8 +171,10 @@ class UsersController extends AbstractController
             // ->replyTo('fabien@example.com')
             // ->priority(Email::PRIORITY_HIGH)
             ->subject('Activate your account')
-            ->text('To activate your account, visit this page : '.$link)
-            ->html('<p>To activate your account, click on this link:</p> <a href="'.$link.'">LINK</a>');
+            ->htmlTemplate('app/mails/confirm-email.html.twig')
+            ->context([
+                'link' => $link,
+            ]);
 
         $mailer->send($email);
 

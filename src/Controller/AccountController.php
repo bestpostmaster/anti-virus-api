@@ -18,4 +18,13 @@ class AccountController extends AbstractController
         return $this->render('app/create-account.html.twig', [
         ]);
     }
+
+    /**
+     * @Route("/private-space", name="private_space")
+     */
+    public function privateSpace(): Response
+    {
+        return $this->render('app/private-space.html.twig', [
+        ]);
+    }
 }
