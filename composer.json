@@ -12,6 +12,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/migrations": "^3.5",
         "doctrine/orm": "^2.10 || ^3.0",
+        "gesdinet/jwt-refresh-token-bundle": "^1.1",
         "lexik/jwt-authentication-bundle": "^2.16",
         "paragonie/sodium_compat": "^1.17",
         "symfony/amazon-mailer": "^5.4",
