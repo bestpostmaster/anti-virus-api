@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class UsersController extends AbstractController
 {
+    protected const DEFAULT_LIMIT = 10;
+    protected const DEFAULT_OFFSET = 0;
     private UserPasswordHasherInterface $passwordEncoder;
     private DenormalizerInterface $denormalizer;
     private string $webSiteName;
@@ -36,11 +38,14 @@ class UsersController extends AbstractController
     }
 
     /**
-     * @Route("/api/admin/users", name="app_users")
+     * @Route("/api/admin/users/{limit?}/{offset?}", name="app_users")
      */
-    public function getUsers(UserRepository $userRepository): Response
+    public function getUsers(Request $request, UserRepository $userRepository): Response
     {
-        $users = $userRepository->findAll();
+        $limit = (int) ($request->get('limit') ?? self::DEFAULT_LIMIT);
+        $offset = (int) ($request->get('offset') ?? self::DEFAULT_OFFSET);
+
+        $users = $userRepository->findBy([], null, $limit, $offset);
         $this->denyAccessUnlessGranted('USER_VIEW_ALL', $users);
 
         return $this->json($users, 200, [], ['groups' => 'user:read']);

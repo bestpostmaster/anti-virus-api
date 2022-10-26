@@ -16,6 +16,10 @@
     <!-- Style -->
     <link rel="stylesheet" href="css/style.css">
 
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.1/dist/bootstrap-table.min.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.12.1/datatables.min.css"/>
+
     <title>Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
     <meta name="description" content="Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
 </head>
@@ -33,7 +37,7 @@
                 <div class="row align-items-center">
                     <div class="col-lg-7 mb-5 mb-lg-0">
 
-                        <h2 class="mb-5">Analyse suspicious files, domains, IPs and URLs</h2>
+                        <h2 class="mb-5" id="h-top">Analyse suspicious files, domains, IPs and URLs</h2>
 
                         <form class="border-right pr-5 mb-5" method="post" id="loginForm" name="contactForm">
                             <div class="row">
@@ -54,7 +58,6 @@
                                     <span class="submitting"></span>
                                 </div>
                             </div>
-
                         </form>
 
                         <div id="form-message-warning"></div>
@@ -64,33 +67,40 @@
                                     <div class="col-md-12 form-group">
                                         <label for="avatar">Choose the file to scan:</label>
                                         <input type="file" id="file" name="file">
-                                    </div>
-                                </div>
+                                        <hr>
 
-                                <div class="row">
-                                    <div class="col-md-12 form-group">
-                                        <input type="text" class="form-control" name="description" id="description" placeholder="Description">
-                                    </div>
-                                </div>
+                                        <div class="row">
+                                            <div class="col-md-12 form-group">
+                                                <input type="text" class="form-control" name="description" id="description" placeholder="Description">
+                                            </div>
+                                        </div>
 
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <input type="submit" value="Start analysis" class="btn btn-primary rounded-0 py-2 px-4">
-                                        <span class="submitting"></span>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <input type="submit" value="Start analysis" class="btn btn-primary rounded-0 py-2 px-4">
+                                                <span class="submitting"></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
-                        </div>
+                            <div id="form-upload-success">
+                                <div class="row">
+                                    <div class="col-md-12 form-group">
+                                        <label for="avatar">Upload successful. <br>
+                                            You will receive a notification after the virus scan is complete</label><br>
+                                        <input type="submit" id="uploadAnotherFile" value="Upload another file" class="btn btn-primary rounded-0 py-2 px-4">
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-12"  id="files-list">
 
-                    </div>
-                    <div id="form-upload-success">
-                        <div class="row">
-                            <div class="col-md-12 form-group">
-                                <label for="avatar">Upload successful. <br>
-                                    You will receive a notification after the virus scan is complete</label><br>
-                                <input type="submit" id="uploadAnotherFile" value="Upload another file" class="btn btn-primary rounded-0 py-2 px-4">
+                                </div>
                             </div>
                         </div>
+
                     </div>
                     <div class="col-lg-4 ml-auto">
                         <p><a href="/create-account">Test this API for free</a></p>
@@ -110,6 +120,13 @@
 <script src="js/popper.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.validate.min.js"></script>
+
+
+<script src="https://unpkg.com/bootstrap-table@1.21.1/dist/bootstrap-table.min.js"></script>
+
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.12.1/datatables.min.js"></script>
+
 <script src="js/main.js"></script>
+
 </body>
 </html>

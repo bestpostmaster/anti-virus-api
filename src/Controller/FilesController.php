@@ -22,6 +22,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FilesController extends AbstractController
 {
+    protected const DEFAULT_LIMIT = 10;
+    protected const DEFAULT_OFFSET = 0;
     private string $hostingDirectory;
     private ManagerRegistry $doctrine;
 
@@ -29,21 +31,6 @@ class FilesController extends AbstractController
     {
         $this->hostingDirectory = $hostingDirectory;
         $this->doctrine = $doctrine;
-    }
-
-    /**
-     * @Route("/api/files", name="app_files")
-     */
-    public function index(HostedFileRepository $hostedFileRepository, string $hostingDirectory): Response
-    {
-        $userId = $this->getUser()->getId();
-        $this->hostingDirectory = $hostingDirectory;
-
-        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-            return $this->json($hostedFileRepository->findAll(), 200, [], ['groups' => 'file:read']);
-        }
-
-        return $this->json($hostedFileRepository->findBy(['user' => $userId]), 200, [], ['groups' => 'file:read']);
     }
 
     /**
@@ -85,7 +72,7 @@ class FilesController extends AbstractController
         $file->setUser($this->getUser());
         $file->setSize($fileSize);
         $file->setScaned(false);
-        $file->setDescription($request->get('description') ?? $receivedFile->getClientOriginalName());
+        $file->setDescription(($request->get('description') && $request->get('description') !== '') ? $request->get('description') : $receivedFile->getClientOriginalName());
         $file->setFilePassword($request->get('filePassword') ?? '');
         $file->setDownloadCounter(0);
         $file->setUrl(md5(uniqid((string) mt_rand(), true)).md5(uniqid((string) mt_rand(), true)));
@@ -106,6 +93,24 @@ class FilesController extends AbstractController
         $bus->dispatch(new VirusScannerMessage($file->getId()));
 
         return $this->json($file, 200, [], ['groups' => 'file:read']);
+    }
+
+    /**
+     * @Route("/api/files/{limit?}/{offset?}", name="app_files")
+     */
+    public function index(Request $request, HostedFileRepository $hostedFileRepository, string $hostingDirectory): Response
+    {
+        $userId = $this->getUser()->getId();
+        $this->hostingDirectory = $hostingDirectory;
+        $limit = (int) ($request->get('limit') ?? self::DEFAULT_LIMIT);
+        $offset = (int) ($request->get('offset') ?? self::DEFAULT_OFFSET);
+        $orderBy = ['id' => 'DESC'];
+
+        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+            return $this->json($hostedFileRepository->findBy([], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
+        }
+
+        return $this->json($hostedFileRepository->findBy(['user' => $userId], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
     }
 
     /**
