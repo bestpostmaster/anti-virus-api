@@ -38,7 +38,7 @@ $(function() {
 
 		files.forEach(function(element, index, array)
 			{
-				let description = '<input type="button" value="'+element.description+'" class="downloadLink" url="'+element.url+'" description="'+element.description+'">'
+				let description = '<input type="button" value="'+element.description+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
 				tableMiddle += '<tr>\n' +
 					'				<td>'+description+'</td>\n' +
 					'				<td>'+element.scaned+'</td>\n' +
@@ -51,7 +51,34 @@ $(function() {
 
 		$("#"+divId).html(tableHead+tableMiddle+tableFoot);
 		$('.downloadLink').click(function() {
-			download($(this).attr('url'), $(this).attr('description'));
+			let fileName = $(this).attr('file_name');
+			let url = '/api/files/download/'+$(this).attr('url');
+
+			var showFile = function (blob) {
+				const data = window.URL.createObjectURL(blob);
+				var link = document.createElement('a');
+				link.href = data;
+				link.download = fileName;
+				link.click();
+				setTimeout(function () {
+					window.URL.revokeObjectURL(data);
+				}, 100)
+			}
+			var jwtToken = sessionStorage.getItem('token');
+			var headerObj = {"Authorization": "Bearer " + jwtToken}
+
+			var xhr = new XMLHttpRequest();
+			$.ajax({
+				xhrFields: {
+					responseType: 'blob'
+				},
+				headers: headerObj,
+				type:'GET',
+				url:url
+			}).done(function(blob){
+				showFile(blob);
+			});
+
 		});
 	}
 
@@ -407,47 +434,4 @@ $(function() {
 
 		}, 15000);
 	}
-
-
-	var download = function(url, fileName) {
-		console.log('download... url : '+url);
-			console.log('download... fileName : '+fileName);
-		$.ajax({
-			url: '/api/files/download/'+url,
-			cache: false,
-			xhr: function () {
-				var xhr = new XMLHttpRequest();
-				xhr.setRequestHeader('Authorization', 'Bearer ' + sessionStorage.getItem('token'));
-				xhr.onreadystatechange = function () {
-					if (xhr.readyState === 2) {
-						if (xhr.status === 200) {
-							xhr.responseType = "blob";
-						} else {
-							xhr.responseType = "text";
-						}
-					}
-				};
-				return xhr;
-			},
-			success: function (data) {
-				//Convert the Byte Data to BLOB object.
-				var blob = new Blob([data], { type: "application/octetstream" });
-
-				//Check the Browser type and download the File.
-				var isIE = false || !!document.documentMode;
-				if (isIE) {
-					window.navigator.msSaveBlob(blob, fileName);
-				} else {
-					var url = window.URL || window.webkitURL;
-					var link = url.createObjectURL(blob);
-					var a = $("<a />");
-					a.attr("download", fileName);
-					a.attr("href", link);
-					$("body").append(a);
-					a[0].click();
-					$("body").remove(a);
-				}
-			}
-		});
-	};
 });

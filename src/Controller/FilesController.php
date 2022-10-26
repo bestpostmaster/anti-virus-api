@@ -96,6 +96,43 @@ class FilesController extends AbstractController
     }
 
     /**
+     * @Route("/api/files/download/{url}", name="app_files_download")
+     */
+    public function download(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): BinaryFileResponse
+    {
+        $userId = $this->getUser()->getId();
+        $url = $request->get('url');
+
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            throw new \Exception('No user logged in');
+        }
+
+        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+            $result = $hostedFileRepository->findOneBy(['url' => $url]);
+        } else {
+            $result = $hostedFileRepository->findOneBy(['url' => $url, 'user' => $userId]);
+        }
+
+        if (!$result) {
+            throw $this->createNotFoundException('The file does not exist');
+        }
+
+        $response = new BinaryFileResponse($this->hostingDirectory.$result->getName());
+        $extension = explode('.', $result->getName())[1] ?? '';
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $result->getDescription().'.'.$extension
+        );
+
+        $em = $doctrine->getManager();
+        $result->setDownloadCounter($result->getDownloadCounter() + 1);
+        $em->persist($result);
+        $em->flush();
+
+        return $response;
+    }
+
+    /**
      * @Route("/api/files/{limit?}/{offset?}", name="app_files")
      */
     public function index(Request $request, HostedFileRepository $hostedFileRepository, string $hostingDirectory): Response
@@ -185,43 +222,6 @@ class FilesController extends AbstractController
         $bus->dispatch(new VirusScannerMessage($file->getId()));
 
         return $this->json($file, 200, [], ['groups' => 'file:read']);
-    }
-
-    /**
-     * @Route("/api/files/download/{url}", name="app_files_download")
-     */
-    public function download(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): BinaryFileResponse
-    {
-        $userId = $this->getUser()->getId();
-        $url = $request->get('url');
-
-        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-            throw new \Exception('No user logged in');
-        }
-
-        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-            $result = $hostedFileRepository->findOneBy(['url' => $url]);
-        } else {
-            $result = $hostedFileRepository->findOneBy(['url' => $url, 'user' => $userId]);
-        }
-
-        if (!$result) {
-            throw $this->createNotFoundException('The file does not exist');
-        }
-
-        $response = new BinaryFileResponse($this->hostingDirectory.$result->getName());
-        $extension = explode('.', $result->getName())[1] ?? '';
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $result->getDescription().'.'.$extension
-        );
-
-        $em = $doctrine->getManager();
-        $result->setDownloadCounter($result->getDownloadCounter() + 1);
-        $em->persist($result);
-        $em->flush();
-
-        return $response;
     }
 
     /**
