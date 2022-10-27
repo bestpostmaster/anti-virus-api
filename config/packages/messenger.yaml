@@ -8,7 +8,7 @@ framework:
 
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
-            scan:
+            commandRunner:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 retry_strategy:
                     max_retries: 5
@@ -20,4 +20,4 @@ framework:
         routing:
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
-            App\Message\VirusScannerMessage: scan
+            App\Message\CommandRunnerMessage: commandRunner

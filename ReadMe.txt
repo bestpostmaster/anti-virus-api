@@ -56,10 +56,11 @@ https://www.postman.com/collections/880b957ed4b9cdded6bf
 
 Run PHPUnit Tests
 -------------------------------------------------------------------
+rm -f var/data.db
 php bin/console doctrine:database:create --env=test
 php bin/console doctrine:schema:drop --force --env=test
 php bin/console doctrine:schema:create --env=test
-php bin/console doctrine:fixtures:load --env=test
+php bin/console doctrine:fixtures:load -n --env=test
 php bin/phpunit
 
 After every entity modification use this command

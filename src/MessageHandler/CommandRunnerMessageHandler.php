@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\HostedFile;
-use App\Message\VirusScannerMessage;
+use App\Entity\ActionRequested;
+use App\Message\CommandRunnerMessage;
 use App\Service\VirusScannerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-final class VirusScannerMessageHandler implements MessageHandlerInterface
+final class CommandRunnerMessageHandler implements MessageHandlerInterface
 {
     private EntityManagerInterface $em;
     private VirusScannerService $virusScannerService;
@@ -21,11 +21,14 @@ final class VirusScannerMessageHandler implements MessageHandlerInterface
         $this->virusScannerService = $virusScannerService;
     }
 
-    public function __invoke(VirusScannerMessage $message)
+    public function __invoke(CommandRunnerMessage $message)
     {
-        $hostedFile = $this->em->find(HostedFile::class, $message->getFileId());
-        echo "\n >>SCAN... File id : ".$message->getFileId()."\n";
-        $this->virusScannerService->scan($hostedFile);
-        echo "\n END. \n";
+        $actionRequested = $this->em->find(ActionRequested::class, $message->getActionRequestedId());
+
+        switch ($actionRequested->getActionName()) {
+            case 'Scan':
+                $this->virusScannerService->runCommand($actionRequested);
+                break;
+        }
     }
 }

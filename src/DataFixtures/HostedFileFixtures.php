@@ -15,11 +15,13 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
 {
     private string $hostingDirectory;
     private string $projectDirectory;
+    private string $quarantineDirectory;
 
-    public function __construct(string $hostingDirectory, string $projectDirectory)
+    public function __construct(string $hostingDirectory, string $projectDirectory, string $quarantineDirectory)
     {
         $this->hostingDirectory = $hostingDirectory;
         $this->projectDirectory = $projectDirectory;
+        $this->quarantineDirectory = $quarantineDirectory;
     }
 
     public function load(ObjectManager $manager): void
@@ -46,9 +48,10 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
             $file->setVirtualDirectory($item['virtualDirectory']);
 
             $actionRequested = new ActionRequested();
-            $actionRequested->setActionName('scan');
             $actionRequested->setDateOfDemand($currentTime);
-            $actionRequested->setActionParameters('');
+            $varLog = DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR;
+            $logPath = $this->projectDirectory.$varLog.$file->getName().'-ScanResult.log';
+            $actionRequested->setActionParameters('-r --move='.$this->quarantineDirectory.' '.$this->hostingDirectory.$file->getName().' -l '.$logPath);
             $actionRequested->setHostedFile($file);
             $actionRequested->setActionResults([]);
             $file->setActionsRequested([$actionRequested]);

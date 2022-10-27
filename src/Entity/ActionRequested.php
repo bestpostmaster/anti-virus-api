@@ -21,17 +21,8 @@ class ActionRequested
      */
     private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @groups("file:read")
-     */
-    private string $actionName;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @groups("file:read")
-     */
-    private string $actionParameters;
+    /** @ORM\Column(type="string", length=255, nullable=true) */
+    private ?string $actionParameters;
 
     /**
      * @ORM\Column(type="datetime")
@@ -43,24 +34,30 @@ class ActionRequested
      * @ORM\Column(type="datetime", nullable=true)
      * @groups("file:read")
      */
-    private \DateTimeInterface $startTime;
+    private ?\DateTimeInterface $startTime;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      * @groups("file:read")
      */
-    private \DateTimeInterface $endTime;
+    private ?\DateTimeInterface $endTime;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=HostedFile::class, inversedBy="actionsRequested")
-     * @groups("file:read")
-     */
+    /** @ORM\ManyToOne(targetEntity=HostedFile::class, inversedBy="actionsRequested") */
     private HostedFile $hostedFile;
 
-    /** @ORM\Column(type="boolean", nullable=false) */
+    /** @ORM\ManyToOne(targetEntity=Action::class, inversedBy="actionsRequested")
+     * @groups("file:read")
+     */
+    private Action $action;
+
+    /** @ORM\Column(type="boolean", nullable=false)
+     * @groups("file:read")
+     */
     private bool $accomplished = false;
 
-    /** @ORM\Column(type="json", nullable=false) */
+    /** @ORM\Column(type="json", nullable=false)
+     * @groups("file:read")
+     */
     private array $actionResults = [];
 
     public function getId(): int
@@ -73,17 +70,7 @@ class ActionRequested
         $this->id = $id;
     }
 
-    public function getActionName(): string
-    {
-        return $this->actionName;
-    }
-
-    public function setActionName(string $actionName): void
-    {
-        $this->actionName = $actionName;
-    }
-
-    public function getActionParameters(): string
+    public function getActionParameters(): ?string
     {
         return $this->actionParameters;
     }
@@ -103,7 +90,7 @@ class ActionRequested
         $this->dateOfDemand = $dateOfDemand;
     }
 
-    public function getStartTime(): \DateTimeInterface
+    public function getStartTime(): ?\DateTimeInterface
     {
         return $this->startTime;
     }
@@ -113,7 +100,7 @@ class ActionRequested
         $this->startTime = $startTime;
     }
 
-    public function getEndTime(): \DateTimeInterface
+    public function getEndTime(): ?\DateTimeInterface
     {
         return $this->endTime;
     }
@@ -123,9 +110,9 @@ class ActionRequested
         $this->endTime = $endTime;
     }
 
-    public function getHostedFile(): ?int
+    public function getHostedFile(): ?HostedFile
     {
-        return $this->hostedFile->getId();
+        return $this->hostedFile;
     }
 
     public function setHostedFile(HostedFile $hostedFile): void
@@ -151,5 +138,15 @@ class ActionRequested
     public function setActionResults(array $actionResults): void
     {
         $this->actionResults = $actionResults;
+    }
+
+    public function getAction(): Action
+    {
+        return $this->action;
+    }
+
+    public function setAction(Action $action): void
+    {
+        $this->action = $action;
     }
 }

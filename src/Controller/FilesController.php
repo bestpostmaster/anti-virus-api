@@ -7,7 +7,8 @@ namespace App\Controller;
 use App\Entity\ActionRequested;
 use App\Entity\HostedFile;
 use App\Entity\User;
-use App\Message\VirusScannerMessage;
+use App\Message\CommandRunnerMessage;
+use App\Repository\ActionRepository;
 use App\Repository\HostedFileRepository;
 use App\Service\FileConverterService;
 use App\Service\VirusScannerService;
@@ -39,7 +40,7 @@ class FilesController extends AbstractController
      *
      * @Route("/api/files/upload", name="app_files_upload")
      */
-    public function upload(Request $request, LoggerInterface $logger, VirusScannerService $virusScannerService, MessageBusInterface $bus): Response
+    public function upload(Request $request, LoggerInterface $logger, MessageBusInterface $bus, ActionRepository $actionRepository): Response
     {
         if (empty($request->files) || !$request->files->get('file')) {
             throw new \Exception('No file sent');
@@ -84,11 +85,16 @@ class FilesController extends AbstractController
         $file->setConversionsAvailable('');
         $file->setVirtualDirectory('/');
 
+        $scanAction = $actionRepository->findOneBy(['actionName' => 'Scan']);
+        if (!$scanAction) {
+            throw new \Exception('Please create scan action raw!');
+        }
+
         $actionRequested = new ActionRequested();
-        $actionRequested->setActionName('scan');
         $actionRequested->setDateOfDemand($currentTime);
         $actionRequested->setActionParameters('');
         $actionRequested->setHostedFile($file);
+        $actionRequested->setAction($scanAction);
         $actionRequested->setActionResults([]);
         $file->setActionsRequested([$actionRequested]);
 
@@ -101,7 +107,7 @@ class FilesController extends AbstractController
         // Without Messenger
         // $virusScannerService->scan($file);
 
-        $bus->dispatch(new VirusScannerMessage($file->getId()));
+        $bus->dispatch(new CommandRunnerMessage($actionRequested->getId()));
 
         return $this->json($file, 200, [], ['groups' => 'file:read']);
     }
@@ -212,7 +218,7 @@ class FilesController extends AbstractController
         // Without Messenger
         // $virusScannerService->scan($file);
 
-        $bus->dispatch(new VirusScannerMessage($file->getId()));
+        $bus->dispatch(new CommandRunnerMessage($file->getId()));
 
         return $this->json($file, 200, [], ['groups' => 'file:read']);
     }
