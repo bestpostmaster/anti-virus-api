@@ -38,20 +38,6 @@ class UsersController extends AbstractController
     }
 
     /**
-     * @Route("/api/admin/users/{limit?}/{offset?}", name="app_users")
-     */
-    public function getUsers(Request $request, UserRepository $userRepository): Response
-    {
-        $limit = (int) ($request->get('limit') ?? self::DEFAULT_LIMIT);
-        $offset = (int) ($request->get('offset') ?? self::DEFAULT_OFFSET);
-
-        $users = $userRepository->findBy([], null, $limit, $offset);
-        $this->denyAccessUnlessGranted('USER_VIEW_ALL', $users);
-
-        return $this->json($users, 200, [], ['groups' => 'user:read']);
-    }
-
-    /**
      * @Route("/api/admin/user/{userId}", name="app_user_infos")
      */
     public function getUserInfos(Request $request, UserRepository $userRepository): Response
@@ -184,6 +170,20 @@ class UsersController extends AbstractController
         $mailer->send($email);
 
         return $this->json($user, 200, [], ['groups' => 'user:read']);
+    }
+
+    /**
+     * @Route("/api/admin/users/{limit?}/{offset?}", name="app_users")
+     */
+    public function getUsers(Request $request, UserRepository $userRepository): Response
+    {
+        $limit = (int) ($request->get('limit') ?? self::DEFAULT_LIMIT);
+        $offset = (int) ($request->get('offset') ?? self::DEFAULT_OFFSET);
+
+        $users = $userRepository->findBy([], null, $limit, $offset);
+        $this->denyAccessUnlessGranted('USER_VIEW_ALL', $users);
+
+        return $this->json($users, 200, [], ['groups' => 'user:read']);
     }
 
     /**

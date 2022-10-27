@@ -129,6 +129,21 @@ class HostedFile
      */
     private array $authorizedUsers;
 
+    /** @ORM\OneToMany(targetEntity=ActionRequested::class, mappedBy="hostedFile", cascade={"persist"})
+     * @groups("file:read")
+     */
+    private $actionsRequested;
+
+    public function getActionsRequested()
+    {
+        return $this->actionsRequested;
+    }
+
+    public function setActionsRequested(array $actionsRequested): void
+    {
+        $this->actionsRequested = $actionsRequested;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

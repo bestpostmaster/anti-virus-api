@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\ActionRequested;
 use App\Entity\HostedFile;
 use App\Entity\User;
 use App\Message\VirusScannerMessage;
@@ -58,6 +59,8 @@ class FilesController extends AbstractController
             throw new \Exception('Upload error...');
         }
 
+        $currentTime = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+
         $currentUser = $this->getUser();
         $manager = $this->doctrine->getManager();
         $currentUser = $manager->find(User::class, $currentUser->getId());
@@ -68,7 +71,7 @@ class FilesController extends AbstractController
         $file = new HostedFile();
         $file->setName($name);
         $file->setClientName($receivedFile->getClientOriginalName());
-        $file->setUploadDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $file->setUploadDate($currentTime);
         $file->setUser($this->getUser());
         $file->setSize($fileSize);
         $file->setScaned(false);
@@ -80,6 +83,14 @@ class FilesController extends AbstractController
         $file->setCopyrightIssue(false);
         $file->setConversionsAvailable('');
         $file->setVirtualDirectory('/');
+
+        $actionRequested = new ActionRequested();
+        $actionRequested->setActionName('scan');
+        $actionRequested->setDateOfDemand($currentTime);
+        $actionRequested->setActionParameters('');
+        $actionRequested->setHostedFile($file);
+        $actionRequested->setActionResults([]);
+        $file->setActionsRequested([$actionRequested]);
 
         $manager = $this->doctrine->getManager();
         $manager->persist($file);
@@ -130,24 +141,6 @@ class FilesController extends AbstractController
         $em->flush();
 
         return $response;
-    }
-
-    /**
-     * @Route("/api/files/{limit?}/{offset?}", name="app_files")
-     */
-    public function index(Request $request, HostedFileRepository $hostedFileRepository, string $hostingDirectory): Response
-    {
-        $userId = $this->getUser()->getId();
-        $this->hostingDirectory = $hostingDirectory;
-        $limit = (int) ($request->get('limit') ?? self::DEFAULT_LIMIT);
-        $offset = (int) ($request->get('offset') ?? self::DEFAULT_OFFSET);
-        $orderBy = ['id' => 'DESC'];
-
-        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-            return $this->json($hostedFileRepository->findBy([], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
-        }
-
-        return $this->json($hostedFileRepository->findBy(['user' => $userId], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
     }
 
     /**
@@ -304,6 +297,24 @@ class FilesController extends AbstractController
         $resultPath = $converter->convert($fileId, $convertTo);
 
         return $this->json(['resultPath' => $resultPath], 200, [], ['groups' => 'file:read']);
+    }
+
+    /**
+     * @Route("/api/files/{limit?}/{offset?}", name="app_files")
+     */
+    public function index(Request $request, HostedFileRepository $hostedFileRepository, string $hostingDirectory): Response
+    {
+        $userId = $this->getUser()->getId();
+        $this->hostingDirectory = $hostingDirectory;
+        $limit = (int) ($request->get('limit') ?? self::DEFAULT_LIMIT);
+        $offset = (int) ($request->get('offset') ?? self::DEFAULT_OFFSET);
+        $orderBy = ['id' => 'DESC'];
+
+        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+            return $this->json($hostedFileRepository->findBy([], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
+        }
+
+        return $this->json($hostedFileRepository->findBy(['user' => $userId], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
     }
 
     private function checkUserCanUpload(User $user, float $fileSize): bool

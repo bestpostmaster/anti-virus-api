@@ -1,23 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700,900&display=swap" rel="stylesheet">
+    {%  include 'app/common-head-tags.html.twig' %}
 
-    <link rel="stylesheet" href="/fonts/icomoon/style.css">
-
-    <link rel="stylesheet" href="/css/owl.carousel.min.css">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-
-    <!-- Style -->
-    <link rel="stylesheet" href="/css/style.css">
-
-    <title>Email confirmation, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
-    <meta name="description" content="Email confirmation, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
+    <title>Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
+    <meta name="description" content="Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
 </head>
 <body>
 
@@ -25,19 +12,46 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10">
-
                 <div class="row align-items-center">
                     <div class="col-lg-7 mb-5 mb-lg-0">
-                        <h2 class="mb-5">Private space</h2>
-                    </div>
-                    <div id="form-email-confirmed">
-                        <div class="row">
-                                <label for="avatar">Here is the list of your files<br><br>
-                                </label><br>
-                                    <div id="list">
-                                        <a href="/">Loading...</a> <br>
+                        <h2 class="mb-5" id="h-top">Welcome in your private space</h2>
+                        <form class="border-right pr-5 mb-5" method="post" id="uploadForm" name="uploadForm">
+                            <div class="row">
+                                <div class="col-md-12 form-group">
+                                    <label for="avatar">Choose the file to scan:</label>
+                                    <input type="file" id="file" name="file">
+                                    <hr>
+
+                                    <div class="row">
+                                        <div class="col-md-12 form-group">
+                                            <input type="text" class="form-control" name="description" id="description" placeholder="Description">
+                                        </div>
                                     </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <input type="submit" value="Start analysis" class="btn btn-primary rounded-0 py-2 px-4">
+                                            <span class="submitting"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="form-upload-success">
+                            <div class="row">
+                                <div class="col-md-12 form-group">
+                                    <label for="avatar">Upload successful. <br>
+                                        You will receive a notification after the virus scan is complete</label><br>
+                                    <input type="submit" id="uploadAnotherFile" value="Upload another file" class="btn btn-primary rounded-0 py-2 px-4">
+                                </div>
+                            </div>
                         </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-12"  id="files-list">
+                            </div>
+                        </div>
+
                     </div>
                     <div class="col-lg-4 ml-auto">
                         <h3 class="mb-4">API for developers [JSON / REST API]</h3>
@@ -50,10 +64,10 @@
     </div>
 </div>
 
-<script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/popper.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/jquery.validate.min.js"></script>
-<script src="/js/main.js"></script>
+
+{%  include 'app/common-js-sources.html.twig' %}
+
+<script src="js/private-space.js"></script>
+
 </body>
 </html>

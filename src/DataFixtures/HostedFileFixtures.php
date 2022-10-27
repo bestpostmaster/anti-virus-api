@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\ActionRequested;
 use App\Entity\HostedFile;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -25,6 +26,7 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
     {
         $users = $manager->getRepository(User::class)->findAll();
         $files = $this->getFilesFixturesFromUsers($users);
+        $currentTime = new \DateTime('2024-07-05T06:00:00Z', new \DateTimeZone('Europe/Paris'));
 
         foreach ($files as $item) {
             $file = new HostedFile();
@@ -42,6 +44,14 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
             $file->setCopyrightIssue($item['copyrightIssue']);
             $file->setConversionsAvailable($item['conversionsAvailable']);
             $file->setVirtualDirectory($item['virtualDirectory']);
+
+            $actionRequested = new ActionRequested();
+            $actionRequested->setActionName('scan');
+            $actionRequested->setDateOfDemand($currentTime);
+            $actionRequested->setActionParameters('');
+            $actionRequested->setHostedFile($file);
+            $actionRequested->setActionResults([]);
+            $file->setActionsRequested([$actionRequested]);
 
             $manager->persist($file);
             $manager->flush($file);

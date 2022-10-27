@@ -1,24 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700,900&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="fonts/icomoon/style.css">
-
-    <link rel="stylesheet" href="css/owl.carousel.min.css">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-
-    <!-- Style -->
-    <link rel="stylesheet" href="css/style.css">
-
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.1/dist/bootstrap-table.min.css">
-
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.12.1/datatables.min.css"/>
+    {%  include 'app/common-head-tags.html.twig' %}
 
     <title>Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
     <meta name="description" content="Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
@@ -38,7 +21,6 @@
                     <div class="col-lg-7 mb-5 mb-lg-0">
 
                         <h2 class="mb-5" id="h-top">Analyse suspicious files, domains, IPs and URLs</h2>
-
                         <form class="border-right pr-5 mb-5" method="post" id="loginForm" name="contactForm">
                             <div class="row">
                                 <div class="col-md-12 form-group">
@@ -103,7 +85,7 @@
 
                     </div>
                     <div class="col-lg-4 ml-auto">
-                        <p><a href="/create-account">Test this API for free</a></p>
+                        <p><a href="/create-account" id="link-test-free">Test this API for free</a></p>
                         <h3 class="mb-4">API for developers [JSON / REST API]</h3>
                         <p>Start scanning user uploaded content and files within minutes. Our JSON API is easy to integrate and quickly lets you scan without overloading your servers.</p>
                         <p><a href="/documentation">Read more</a></p>
@@ -114,19 +96,9 @@
     </div>
 </div>
 
+{%  include 'app/common-js-sources.html.twig' %}
 
-
-<script src="js/jquery-3.6.1.min.js"></script>
-<script src="js/popper.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/jquery.validate.min.js"></script>
-
-
-<script src="https://unpkg.com/bootstrap-table@1.21.1/dist/bootstrap-table.min.js"></script>
-
-<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.12.1/datatables.min.js"></script>
-
-<script src="js/main.js"></script>
+<script src="js/index.js"></script>
 
 </body>
 </html>
