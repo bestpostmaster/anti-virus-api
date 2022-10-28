@@ -20,6 +20,8 @@ class UsersController extends AbstractController
 {
     protected const DEFAULT_LIMIT = 10;
     protected const DEFAULT_OFFSET = 0;
+    protected const RESPONSE_ONE = '19';
+    protected const RESPONSE_TWO = '17';
     private UserPasswordHasherInterface $passwordEncoder;
     private DenormalizerInterface $denormalizer;
     private string $webSiteName;
@@ -132,11 +134,15 @@ class UsersController extends AbstractController
      */
     public function registerFromFront(Request $request, ManagerRegistry $doctrine, MailerInterface $mailer): Response
     {
-        $data = json_decode($request->getContent());
+        $data = (array) json_decode($request->getContent());
+
+        if (!isset($data['email'], $data['password1'], $data['password2'], $data['response1'], $data['response2']) || $data['response1'] !== $this::RESPONSE_ONE || $data['response2'] !== $this::RESPONSE_TWO) {
+            return $this->json($data, 400, [], []);
+        }
 
         $user = new User();
-        $user->setLogin($data->email);
-        $user->setEmail($data->email);
+        $user->setLogin($data['email']);
+        $user->setEmail($data['email']);
         $user->setRoles([
             'ROLE_USER',
         ]);
@@ -145,7 +151,7 @@ class UsersController extends AbstractController
         $user->setSecretTokenForValidation(md5(uniqid((string) mt_rand(), true)).md5(uniqid((string) mt_rand(), true)));
         $user->setPassword($this->passwordEncoder->hashPassword(
             $user,
-            $data->password1
+            $data['password1']
         ));
 
         $manager = $doctrine->getManager();

@@ -26,7 +26,13 @@ $(function() {
 					email: {
 						required: true,
 						email: true
-					}
+					},
+					response1: {
+						required: true
+					},
+					response2: {
+						required: true
+					},
 				},
 				messages: {
 					email: {
@@ -38,6 +44,8 @@ $(function() {
 						required: "Please enter your password",
 						equalTo: "Please enter the same password as above"
 					},
+					response1: "Please calculate the requested sum and give the result (numbers)",
+					response2: "Please calculate the requested sum and give the result (numbers)",
 				},
 				/* submit via ajax */
 				submitHandler: function(form) {
