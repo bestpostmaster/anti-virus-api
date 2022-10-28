@@ -13,6 +13,26 @@ $(function() {
 		}, 1400);
 	});
 
+	var updateTableView = function (elements) {
+		elements.forEach(function(element, index, array)
+		{
+			if ($("#file-details-"+element.id)) {
+				if (element.actionsRequested[0].accomplished === true) {
+					$("#file-action-status-"+element.id).html('Done');
+					if (element.infected) {
+						$("#file-action-result-"+element.id).html('<b style="color: darkred">!!>Infected!</b>');
+						return;
+					}
+					$("#file-action-result-"+element.id).html('<b style="color: #1e7e34">Is safe</b>');
+					return;
+				}
+
+				$("#file-action-status-"+element.id).html('In progress..')
+				$("#file-action-result-"+element.id).html('');
+			}
+		});
+	}
+
 	function initRefreshList(response, limit, offset) {
 		setTimeout(function(){
 
@@ -28,7 +48,7 @@ $(function() {
 				beforeSend: function() {
 				},
 				success: function(response) {
-					// To action
+					updateTableView(response);
 
 					initRefreshList(response, limit, offset);
 				},
@@ -81,15 +101,42 @@ $(function() {
 			'        </thead>\n';
 
 		let tableMiddle = '';
+
+		var generateFileDetails = function(id, elementDescription, name, url, actionName, status, result) {
+			let description = '<input type="button" value="'+elementDescription+'" class="downloadLink" file_name="'+name+'" url="'+url+'" description="'+elementDescription+'">'
+			return '<tr id="file-details-'+id+'">\n' +
+				'				<td id="file-description-'+id+'">'+description+'</td>\n' +
+				'				<td id="file-action-'+id+'">'+actionName+'</td>\n' +
+				'				<td id="file-action-status-'+id+'">'+status+'</td>\n' +
+				'				<td id="file-action-result-'+id+'">'+result+'</td>\n' +
+				'			</tr>\n';
+		}
+
 		files.forEach(function(element, index, array)
 			{
 				lastOffset++;
 				let description = '<input type="button" value="'+element.description+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
+
+				if (element.actionsRequested[0].accomplished === false) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'In progress..', '');
+					return;
+				}
+
+				if (element.infected) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
+					return;
+				}
+
+				if (!element.infected) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
+					return;
+				}
+
 				tableMiddle += '<tr>\n' +
 					'				<td>'+description+'</td>\n' +
 					'				<td>'+element.actionsRequested[0].action.actionName+'</td>\n' +
 					'				<td>'+element.actionsRequested[0].accomplished+'</td>\n' +
-					'				<td>'+element.infected+'</td><td></td>\n' +
+					'				<td>'+element.infected+'</td>\n' +
 					'			</tr>\n'
 			}
 		);
