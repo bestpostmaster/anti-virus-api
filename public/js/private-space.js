@@ -1,6 +1,7 @@
 $(function() {
 
 	'use strict';
+	var lastOffset = 0
 
 	$('#uploadAnotherFile').click(function() {
 		$('#form-message-warning').hide();
@@ -12,7 +13,34 @@ $(function() {
 		}, 1400);
 	});
 
-	var getFilesList = function(limit = 50, offset = 0) {
+	function initRefreshList(response, limit, offset) {
+		setTimeout(function(){
+
+			$.ajax({
+				type: "POST",
+				url: "/api/files/"+limit+'/'+offset,
+				contentType: "application/json",
+				dataType: "json",
+				headers: {
+					Authorization: 'Bearer '+sessionStorage.getItem('token')
+				},
+
+				beforeSend: function() {
+				},
+				success: function(response) {
+					// To action
+
+					initRefreshList(response, limit, offset);
+				},
+				error: function() {
+
+				}
+			});
+
+		}, 5000);
+	}
+
+	var getFilesList = function(limit = 10, offset = 0) {
 		let dataReceived = null;
 		$.ajax({
 			type: "POST",
@@ -28,9 +56,11 @@ $(function() {
 			},
 			success: function(data) {
 				dataReceived = data;
+				initRefreshList(data, limit, offset);
 			},
 			error: function() {
-				alert('Your are disconected!');
+				sessionStorage.clear();
+				alert('Your are disconnected!');
 				document.location.href="/";
 			}
 		});
@@ -45,24 +75,26 @@ $(function() {
 			'            <tr>\n' +
 			'                <th>File name</th>\n' +
 			'                <th>Actions</th>\n' +
+			'                <th>Status</th>\n' +
 			'                <th>Result</th>\n' +
 			'            </tr>\n' +
 			'        </thead>\n';
 
 		let tableMiddle = '';
-
 		files.forEach(function(element, index, array)
 			{
+				lastOffset++;
 				let description = '<input type="button" value="'+element.description+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
 				tableMiddle += '<tr>\n' +
 					'				<td>'+description+'</td>\n' +
-					'				<td>'+element.scaned+'</td>\n' +
+					'				<td>'+element.actionsRequested[0].action.actionName+'</td>\n' +
+					'				<td>'+element.actionsRequested[0].accomplished+'</td>\n' +
 					'				<td>'+element.infected+'</td><td></td>\n' +
 					'			</tr>\n'
 			}
 		);
 
-		let tableFoot = '    </table>';
+		let tableFoot = '    </table><br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" id="load-more">Load more..</a>';
 
 		$("#"+divId).html(tableHead+tableMiddle+tableFoot);
 		$('.downloadLink').click(function() {
@@ -94,6 +126,29 @@ $(function() {
 				showFile(blob);
 			});
 
+		});
+
+		var appendElementsToList = function(elementsToAppend) {
+			let trMiddle = '';
+			elementsToAppend.forEach(function(element, index, array)
+			{
+				lastOffset++;
+				let description = '<input type="button" value="'+element.description+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
+				trMiddle += '<tr>\n' +
+					'				<td>'+description+'</td>\n' +
+					'				<td>'+element.actionsRequested[0].action.actionName+'</td>\n' +
+					'				<td>'+element.actionsRequested[0].accomplished+'</td>\n' +
+					'				<td>'+element.infected+'</td><td></td>\n' +
+					'			</tr>\n';
+			});
+			$("#files").append(trMiddle);
+		}
+
+		$('#load-more').click(function() {
+			var elementsToAppend = getFilesList(10, lastOffset);
+			if(elementsToAppend.length > 0) {
+				appendElementsToList(elementsToAppend);
+			}
 		});
 	}
 

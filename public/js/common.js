@@ -18,7 +18,7 @@ function initRefreshTokenCalls() {
                 }
             },
             error: function() {
-                alert('Your are disconected!');
+                alert('Your are disconnected!');
                 sessionStorage.setItem('refreshToken', response.refresh_token);
                 document.location.href="/";
             }
@@ -33,3 +33,8 @@ function sessionExists(){
 
     return (token && refreshToken && token !== '' && refreshToken !== '');
 }
+
+$('#btn-log-out').click(function() {
+    sessionStorage.clear();
+    document.location.href="/";
+});

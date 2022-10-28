@@ -103,7 +103,7 @@ $(function() {
 					}
 				},
 				error: function() {
-					alert('Your are disconected!');
+					alert('Your are disconnected!');
 					sessionStorage.setItem('refreshToken', response.refresh_token);
 					document.location.href="/";
 				}
