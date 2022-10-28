@@ -141,7 +141,7 @@ $(function() {
 			}
 		);
 
-		let tableFoot = '    </table><br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" id="load-more">Load more..</a>';
+		let tableFoot = '    </table><br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" id="load-more">Load more..</a>';
 
 		$("#"+divId).html(tableHead+tableMiddle+tableFoot);
 		$('.downloadLink').click(function() {
@@ -180,13 +180,21 @@ $(function() {
 			elementsToAppend.forEach(function(element, index, array)
 			{
 				lastOffset++;
-				let description = '<input type="button" value="'+element.description+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
-				trMiddle += '<tr>\n' +
-					'				<td>'+description+'</td>\n' +
-					'				<td>'+element.actionsRequested[0].action.actionName+'</td>\n' +
-					'				<td>'+element.actionsRequested[0].accomplished+'</td>\n' +
-					'				<td>'+element.infected+'</td><td></td>\n' +
-					'			</tr>\n';
+
+				if (element.actionsRequested[0].accomplished === false) {
+					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'In progress..', '');
+					return;
+				}
+
+				if (element.infected) {
+					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
+					return;
+				}
+
+				if (!element.infected) {
+					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
+					return;
+				}
 			});
 			$("#files").append(trMiddle);
 		}
