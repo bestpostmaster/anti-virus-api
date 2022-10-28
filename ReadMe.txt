@@ -94,4 +94,31 @@ sudo chown -R www-data:www-data SYMFONY_DIRECTORY
 sudo usermod -a -G www-data admin
 sudo chmod -R 770 SYMFONY_DIRECTORY
 
+AWS EC2 Firewall Configuration (IN)
+------------------------------------------------------------------
+–
+sgr-018a3a647a6fa0384	IPv4	LDAP	TCP	389	0.0.0.0/0	–
+
+–
+sgr-0d4f7b854b05508d4	IPv4	SMTP	TCP	25	0.0.0.0/0	–
+
+–
+sgr-022ed2f4ea0464521	IPv4	SSH	TCP	22	0.0.0.0/0	–
+
+–
+sgr-0eb458371c351ee75	IPv4	HTTP	TCP	80	0.0.0.0/0	–
+
+–
+sgr-0477e1c69354b92c3	IPv4	HTTPS	TCP	443	0.0.0.0/0	–
+
+AWS EC2 Firewall Configuration (OUT)
+------------------------------------------------------------------
+–
+sgr-075d4cb7158770eef	IPv4	SMTP	TCP	25	0.0.0.0/0	–
+
+–
+sgr-03581b0ec0290f23c	IPv4	SMTPS	TCP	465	0.0.0.0/0	–
+
+–
+sgr-0b7776abb76b98679	IPv4	HTTPS	TCP	443	0.0.0.0/0	–
 
