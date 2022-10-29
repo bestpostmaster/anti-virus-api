@@ -17,7 +17,7 @@ $(function() {
 		elements.forEach(function(element, index, array)
 		{
 			if ($("#file-details-"+element.id)) {
-				if (element.actionsRequested[0].accomplished === true) {
+				if (element.actionsRequested[0] && element.actionsRequested[0].accomplished === true) {
 					$("#file-action-status-"+element.id).html('Done');
 					if (element.infected) {
 						$("#file-action-result-"+element.id).html('<b style="color: darkred">!!>Infected!</b>');
@@ -117,26 +117,28 @@ $(function() {
 				lastOffset++;
 				let description = '<input type="button" value="'+element.description+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
 
-				if (element.actionsRequested[0].accomplished === false) {
+				if (element.actionsRequested[0] && element.actionsRequested[0].accomplished === false) {
 					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'In progress..', '');
 					return;
 				}
 
-				if (element.infected) {
+				if (element.actionsRequested[0] && element.infected) {
 					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
 					return;
 				}
 
-				if (!element.infected) {
+				if (element.actionsRequested[0] && !element.infected) {
 					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
 					return;
 				}
 
+				var actionsRequested = element.actionsRequested[0] ? element.actionsRequested[0] : 'No action';
+
 				tableMiddle += '<tr>\n' +
 					'				<td>'+description+'</td>\n' +
-					'				<td>'+element.actionsRequested[0].action.actionName+'</td>\n' +
-					'				<td>'+element.actionsRequested[0].accomplished+'</td>\n' +
-					'				<td>'+element.infected+'</td>\n' +
+					'				<td>'+actionsRequested+'</td>\n' +
+					'				<td>'+actionsRequested+'</td>\n' +
+					'				<td></td>\n' +
 					'			</tr>\n'
 			}
 		);
