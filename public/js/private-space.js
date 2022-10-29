@@ -103,7 +103,7 @@ $(function() {
 		let tableMiddle = '';
 
 		var generateFileDetails = function(id, elementDescription, name, url, actionName, status, result) {
-			let description = '<input type="button" value="'+elementDescription+'" class="downloadLink" file_name="'+name+'" url="'+url+'" description="'+elementDescription+'">'
+			let description = '<input type="button" value="'+elementDescription.slice(-25)+'" class="downloadLink" file_name="'+name+'" url="'+url+'" description="'+elementDescription+'">'
 			return '<tr id="file-details-'+id+'">\n' +
 				'				<td id="file-description-'+id+'">'+description+'</td>\n' +
 				'				<td id="file-action-'+id+'">'+actionName+'</td>\n' +
@@ -115,7 +115,7 @@ $(function() {
 		files.forEach(function(element, index, array)
 			{
 				lastOffset++;
-				let description = '<input type="button" value="'+element.description+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
+				let description = '<input type="button" value="'+(element.description).slice(-25)+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
 
 				if (element.actionsRequested[0] && element.actionsRequested[0].accomplished === false) {
 					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'In progress..', '');

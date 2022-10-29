@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Action;
 use App\Entity\ActionRequested;
 use App\Entity\HostedFile;
 use App\Entity\User;
@@ -93,13 +94,7 @@ class FilesController extends AbstractController
             throw new \Exception('Please create scan action raw!');
         }
 
-        $actionRequested = new ActionRequested();
-        $actionRequested->setDateOfDemand($currentTime);
-        $actionRequested->setActionParameters('');
-        $actionRequested->setHostedFile($file);
-        $actionRequested->setAction($scanAction);
-        $actionRequested->setActionResults([]);
-        $file->setActionsRequested([$actionRequested]);
+        $actionRequested = $this->createActionRequested($currentTime, $file, $scanAction);
 
         $manager = $this->doctrine->getManager();
         $manager->persist($file);
@@ -138,10 +133,11 @@ class FilesController extends AbstractController
         }
 
         $response = new BinaryFileResponse($this->hostingDirectory.$result->getName());
+
         $extension = explode('.', $result->getName())[1] ?? '';
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $result->getDescription().'.'.$extension
+            $this->clean($result->getDescription()).'.'.$extension
         );
 
         $em = $doctrine->getManager();
@@ -152,12 +148,19 @@ class FilesController extends AbstractController
         return $response;
     }
 
+    public function clean($string)
+    {
+        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+    }
+
     /**
      * TO DO
      *
      * @Route("/api/files/upload-from-url", name="app_files_upload_from_url")
      */
-    public function uploadFromUrl(Request $request, LoggerInterface $logger, VirusScannerService $virusScannerService, MessageBusInterface $bus): Response
+    public function uploadFromUrl(Request $request, LoggerInterface $logger, VirusScannerService $virusScannerService, MessageBusInterface $bus, ActionRepository $actionRepository): Response
     {
         if (!$request->get('url')) {
             throw new \Exception('No url sent');
@@ -192,14 +195,18 @@ class FilesController extends AbstractController
         $currentUser = $this->getUser();
         $manager = $this->doctrine->getManager();
         $currentUser = $manager->find(User::class, $currentUser->getId());
+        $currentTime = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
 
         $fileSize = round(filesize($this->hostingDirectory.$name) / 1000000, 4);
-        $this->checkUserCanUpload($currentUser, $fileSize);
+
+        if (!$this->checkUserCanUpload($currentUser, $fileSize)) {
+            return $this->json([], 200, ['upload' => 'ko', 'message' => 'NotEnoughStorageSpace Exception']);
+        }
 
         $file = new HostedFile();
         $file->setName($name);
         $file->setClientName($fileName ?? $url);
-        $file->setUploadDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $file->setUploadDate($currentTime);
         $file->setUser($this->getUser());
         $file->setSize($fileSize);
         $file->setScaned(false);
@@ -211,6 +218,13 @@ class FilesController extends AbstractController
         $file->setCopyrightIssue(false);
         $file->setConversionsAvailable('');
         $file->setVirtualDirectory('/');
+
+        $scanAction = $actionRepository->findOneBy(['actionName' => 'Scan']);
+        if (!$scanAction) {
+            throw new \Exception('Please create scan action raw!');
+        }
+
+        $actionRequested = $this->createActionRequested($currentTime, $file, $scanAction);
 
         $manager = $this->doctrine->getManager();
         $manager->persist($file);
@@ -345,5 +359,18 @@ class FilesController extends AbstractController
         $user->setTotalSpaceUsedMo($user->getTotalSpaceUsedMo() - $sizeToDeduct);
         $manager->persist($user);
         $manager->flush($user);
+    }
+
+    public function createActionRequested(\DateTime $currentTime, HostedFile $file, Action $scanAction): ActionRequested
+    {
+        $actionRequested = new ActionRequested();
+        $actionRequested->setDateOfDemand($currentTime);
+        $actionRequested->setActionParameters('');
+        $actionRequested->setHostedFile($file);
+        $actionRequested->setAction($scanAction);
+        $actionRequested->setActionResults([]);
+        $file->setActionsRequested([$actionRequested]);
+
+        return $actionRequested;
     }
 }
