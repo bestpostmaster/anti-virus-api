@@ -268,7 +268,7 @@ class FilesController extends AbstractController
     /**
      * @Route("/api/files/delete/{fileId}", name="app_files_delete", methods={"DELETE"})
      */
-    public function deleteById(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): Response
+    public function deleteById(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine, ActionRepository $actionRepository): Response
     {
         $userId = $this->getUser()->getId();
         $id = $request->get('fileId');

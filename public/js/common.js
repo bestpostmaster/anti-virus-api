@@ -17,7 +17,7 @@ function initRefreshTokenCalls() {
                     initRefreshTokenCalls();
                 }
             },
-            error: function() {
+            error: function(request, status, error) {
                 alert('Your are disconnected!');
                 sessionStorage.setItem('refreshToken', response.refresh_token);
                 document.location.href="/";

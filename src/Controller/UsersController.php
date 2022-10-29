@@ -132,12 +132,17 @@ class UsersController extends AbstractController
     /**
      * @Route("/api/users/register", name="app_users_register")
      */
-    public function registerFromFront(Request $request, ManagerRegistry $doctrine, MailerInterface $mailer): Response
+    public function registerFromFront(Request $request, ManagerRegistry $doctrine, MailerInterface $mailer, UserRepository $userRepository): Response
     {
         $data = (array) json_decode($request->getContent());
 
         if (!isset($data['email'], $data['password1'], $data['password2'], $data['response1'], $data['response2']) || $data['response1'] !== $this::RESPONSE_ONE || $data['response2'] !== $this::RESPONSE_TWO) {
-            return $this->json($data, 400, [], []);
+            return $this->json(['error' => '140', 'field' => '', 'message' => 'Please check all fields', 'data' => $data], 200, [], ['status' => 'ko', 'message' => 'This email address already exists in our database']);
+        }
+
+        $usersWithSameMail = $userRepository->findBy(['email' => strtolower($data['email'])]);
+        if (!empty($usersWithSameMail)) {
+            return $this->json(['error' => '145', 'field' => 'email', 'message' => 'This email address already exists in our database', 'data' => $data], 200, [], ['status' => 'ko', 'message' => 'This email address already exists in our database']);
         }
 
         $user = new User();

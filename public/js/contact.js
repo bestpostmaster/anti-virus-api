@@ -71,7 +71,7 @@ $(function() {
 								$submit.css('display', 'none');
 							}
 						},
-						error: function() {
+						error: function(request, status, error) {
 							$('#form-message-warning').html("Something went wrong. Please try again.")
 								.fadeIn();
 							$submit.css('display', 'none');
@@ -102,7 +102,7 @@ $(function() {
 						initRefreshTokenCalls();
 					}
 				},
-				error: function() {
+				error: function(request, status, error) {
 					alert('Your are disconnected!');
 					sessionStorage.setItem('refreshToken', response.refresh_token);
 					document.location.href="/";

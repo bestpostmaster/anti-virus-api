@@ -48,3 +48,9 @@ services:
         #arguments: [Doctrine\Persistence\ManagerRegistry]
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
+
+    api.event.authentication_success_listener:
+        class: App\Subscriber\AuthenticationSuccessListener
+        #arguments: [Doctrine\Persistence\ManagerRegistry]
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }

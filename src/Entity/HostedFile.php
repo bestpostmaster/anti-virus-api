@@ -129,7 +129,7 @@ class HostedFile
      */
     private array $authorizedUsers;
 
-    /** @ORM\OneToMany(targetEntity=ActionRequested::class, mappedBy="hostedFile", cascade={"persist"})
+    /** @ORM\OneToMany(targetEntity=ActionRequested::class, mappedBy="hostedFile", cascade={"persist", "remove"})
      * @groups("file:read")
      */
     private $actionsRequested;

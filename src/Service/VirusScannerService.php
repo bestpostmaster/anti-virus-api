@@ -90,6 +90,5 @@ Data read: 14.12 MB (ratio 1.76:1)
 Time: 41.191 sec (0 m 41 s)
 Start Date: 2022:10:29 17:49:09
 End Date:   2022:10:29 17:49:50');
-
     }
 }

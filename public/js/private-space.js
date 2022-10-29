@@ -52,7 +52,7 @@ $(function() {
 
 					initRefreshList(response, limit, offset);
 				},
-				error: function() {
+				error: function(request, status, error) {
 
 				}
 			});
@@ -78,7 +78,7 @@ $(function() {
 				dataReceived = data;
 				initRefreshList(data, limit, offset);
 			},
-			error: function() {
+			error: function(request, status, error) {
 				sessionStorage.clear();
 				alert('Your are disconnected!');
 				document.location.href="/";
@@ -89,7 +89,6 @@ $(function() {
 	}
 
 	function displayFilesList(files, divId) {
-		console.log('displayFilesList', files, divId);
 		let tableHead = '<table id="files" class="table table-striped" style="width:100%">\n' +
 			'        <thead>\n' +
 			'            <tr>\n' +
@@ -277,8 +276,6 @@ $(function() {
 							}
 						},
 						error: function(request, status, error) {
-							console.log('Upload status : ', status);
-							console.log('Upload error : ', error);
 							$('#form-message-warning').html("Something went wrong. Please try again.")
 								.fadeIn();
 							$submit.css('display', 'none');

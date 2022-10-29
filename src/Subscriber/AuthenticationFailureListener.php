@@ -7,6 +7,7 @@ namespace App\Subscriber;
 use App\Entity\Flood;
 use Doctrine\Persistence\ManagerRegistry;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationFailureEvent;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AuthenticationFailureListener
 {
@@ -19,6 +20,8 @@ class AuthenticationFailureListener
 
     public function onAuthenticationFailureResponse(AuthenticationFailureEvent $event): void
     {
+        $event->setResponse(new JsonResponse(['error' => '0024', 'message' => 'Bad credentials']));
+
         $this->removeOldFloods();
         $ip = $this->getIp();
         $maxTryInTenSeconds = 3;
