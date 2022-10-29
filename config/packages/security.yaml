@@ -46,6 +46,7 @@ security:
         - { path: ^/api_refresh_token, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/home, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/status, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/vmstat, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/users/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/users/confirm-email-address, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/test-email, roles: IS_AUTHENTICATED_ANONYMOUSLY }

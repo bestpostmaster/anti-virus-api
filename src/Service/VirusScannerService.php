@@ -13,13 +13,15 @@ class VirusScannerService
     private string $hostingDirectory;
     private string $quarantineDirectory;
     private string $projectDirectory;
+    private string $kernelEnvironment;
 
-    public function __construct(ManagerRegistry $doctrine, string $hostingDirectory, string $quarantineDirectory, string $projectDirectory)
+    public function __construct(ManagerRegistry $doctrine, string $hostingDirectory, string $quarantineDirectory, string $projectDirectory, string $kernelEnvironment)
     {
         $this->doctrine = $doctrine;
         $this->hostingDirectory = $hostingDirectory;
         $this->quarantineDirectory = $quarantineDirectory;
         $this->projectDirectory = $projectDirectory;
+        $this->kernelEnvironment = $kernelEnvironment;
     }
 
     public function runCommand(ActionRequested $actionRequested): void
@@ -39,7 +41,13 @@ class VirusScannerService
         $commandParameters = '-r --move='.$this->quarantineDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$logPath;
         $actionRequested->setStartTime(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $actionRequested->setActionParameters($commandParameters);
-        exec($actionRequested->getAction()->getCommandToRun().' '.$commandParameters);
+        $fullCommandToRun = $actionRequested->getAction()->getCommandToRun().' '.$commandParameters;
+
+        if ($this->kernelEnvironment === 'dev') {
+            $fullCommandToRun = 'php bin/console app:simulate-scan -log '.$fullCommandToRun;
+        }
+
+        exec($fullCommandToRun);
 
         if (!file_exists($logPath)) {
             throw new \RuntimeException(sprintf('Please check AntiVirus installation : '.$logPath.' command : '.'clamscan -r --move='.$this->quarantineDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$logPath));
@@ -47,11 +55,9 @@ class VirusScannerService
 
         $actionRequested->setEndTime(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $actionRequested->setAccomplished(true);
-        $scanResult = file_get_contents($this->projectDirectory.$varLog.$hostedFile->getName().'-ScanResult.log');
-        $scanResult = str_replace($this->projectDirectory.$varLog, '', $scanResult);
-        $scanResult = str_replace($this->quarantineDirectory, '/quarantine/', $scanResult);
-        $scanResult = str_replace($this->hostingDirectory, '/', $scanResult);
-        $scanResult = str_replace($hostedFile->getName(), $hostedFile->getClientName(), $scanResult);
+        $scanResult = file_get_contents($logPath);
+        $scanResult = str_replace([$this->projectDirectory.$varLog, $this->quarantineDirectory, $this->hostingDirectory, $hostedFile->getName()],
+            ['', '/quarantine/', '/', $hostedFile->getClientName()], $scanResult);
         $scanResult = '[REF : '.$hostedFile->getName()." ] \n".$scanResult;
 
         if (str_contains($scanResult, 'Infected files: 1')) {
@@ -63,5 +69,9 @@ class VirusScannerService
         $em = $this->doctrine->getManager();
         $em->persist($hostedFile);
         $em->flush();
+    }
+
+    private function simulateAntivirusScan()
+    {
     }
 }

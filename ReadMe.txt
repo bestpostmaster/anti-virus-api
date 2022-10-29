@@ -62,6 +62,7 @@ php bin/console doctrine:schema:drop --force --env=test
 php bin/console doctrine:schema:create --env=test
 php bin/console doctrine:fixtures:load -n --env=test
 php bin/phpunit
+ls
 
 After every entity modification use this command
 -------------------------------------------------------------------
@@ -124,4 +125,8 @@ sgr-012d45eb7c1d16f70	IPv4	HTTP	TCP	80	0.0.0.0/0	–
 
 –
 sgr-0b7776abb76b98679	IPv4	HTTPS	TCP	443	0.0.0.0/0	–
+
+Disable clamav-daemon
+------------------------------------------------------------------
+sudo systemctl disable clamav-daemon
 

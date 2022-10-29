@@ -67,7 +67,10 @@ class FilesController extends AbstractController
         $currentUser = $manager->find(User::class, $currentUser->getId());
 
         $fileSize = round(filesize($this->hostingDirectory.$name) / 1000000, 4);
-        $this->checkUserCanUpload($currentUser, $fileSize);
+
+        if (!$this->checkUserCanUpload($currentUser, $fileSize)) {
+            return $this->json([], 200, ['upload' => 'ko', 'message' => 'NotEnoughStorageSpace Exception']);
+        }
 
         $file = new HostedFile();
         $file->setName($name);
@@ -325,11 +328,7 @@ class FilesController extends AbstractController
 
     private function checkUserCanUpload(User $user, float $fileSize): bool
     {
-        if ($fileSize + $user->getTotalSpaceUsedMo() > $user->getAuthorizedSizeMo()) {
-            throw new \Exception('not enough storage space');
-        }
-
-        return true;
+        return $fileSize + $user->getTotalSpaceUsedMo() <= $user->getAuthorizedSizeMo();
     }
 
     private function increaseUserSpace(User $user, float $sizeToAdd): void
