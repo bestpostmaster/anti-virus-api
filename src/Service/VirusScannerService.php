@@ -44,7 +44,8 @@ class VirusScannerService
         $fullCommandToRun = $actionRequested->getAction()->getCommandToRun().' '.$commandParameters;
 
         if ($this->kernelEnvironment === 'dev') {
-            $fullCommandToRun = 'php bin/console app:simulate-scan -log '.$fullCommandToRun;
+            $this->simulateScan($logPath);
+            $fullCommandToRun = 'ls';
         }
 
         exec($fullCommandToRun);
@@ -71,7 +72,24 @@ class VirusScannerService
         $em->flush();
     }
 
-    private function simulateAntivirusScan()
+    public function simulateScan(string $logPath): void
     {
+        sleep(20);
+        file_put_contents($logPath, '
+-------------------------------------------------------------------------------
+
+
+----------- SCAN SUMMARY -----------
+Known viruses: 8641488
+Engine version: 0.103.7
+Scanned directories: 0
+Scanned files: 1
+Infected files: 0
+Data scanned: 24.87 MB
+Data read: 14.12 MB (ratio 1.76:1)
+Time: 41.191 sec (0 m 41 s)
+Start Date: 2022:10:29 17:49:09
+End Date:   2022:10:29 17:49:50');
+
     }
 }

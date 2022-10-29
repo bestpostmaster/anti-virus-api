@@ -49,7 +49,7 @@ php bin/console doctrine:fixtures:load
 JSON Collection for Postman
 
 Run Worker to consume messages :
-php bin/console messenger:consume scan -vv
+php bin/console messenger:consume commandRunner -vv
 
 -------------------------------------------------------------------
 https://www.postman.com/collections/880b957ed4b9cdded6bf

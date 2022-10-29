@@ -235,7 +235,7 @@ class FilesController extends AbstractController
         // Without Messenger
         // $virusScannerService->scan($file);
 
-        $bus->dispatch(new CommandRunnerMessage($file->getId()));
+        $bus->dispatch(new CommandRunnerMessage($actionRequested->getId()));
 
         return $this->json($file, 200, [], ['groups' => 'file:read']);
     }
