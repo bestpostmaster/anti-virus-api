@@ -130,3 +130,8 @@ Disable clamav-daemon
 ------------------------------------------------------------------
 sudo systemctl disable clamav-daemon
 
+Update ClamAV database :
+------------------------------------------------------------------
+sudo systemctl stop clamav-freshclam.service
+sudo freshclam
+sudo systemctl start clamav-freshclam.service
