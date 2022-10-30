@@ -37,8 +37,6 @@ class FilesController extends AbstractController
     }
 
     /**
-     * TO DO
-     *
      * @Route("/api/files/upload", name="app_files_upload")
      */
     public function upload(Request $request, LoggerInterface $logger, MessageBusInterface $bus, ActionRepository $actionRepository): Response
@@ -111,6 +109,36 @@ class FilesController extends AbstractController
     }
 
     /**
+     * @Route("/api/files/edit-file-info/{fileId}", name="edit_file_info")
+     */
+    public function edit(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): Response
+    {
+        $userId = $this->getUser()->getId();
+        $id = $request->get('fileId');
+
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            throw new \Exception('No user logged in');
+        }
+
+        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+            $file = $hostedFileRepository->findOneBy(['id' => $id]);
+        } else {
+            $file = $hostedFileRepository->findOneBy(['id' => $id, 'user' => $userId]);
+        }
+
+        if (!$file) {
+            throw $this->createNotFoundException('Unknown file id : '.$request->get('fileId'));
+        }
+
+        $file = $this->hydrateFile($request, $file);
+        $em = $doctrine->getManager();
+        $em->persist($file);
+        $em->flush();
+
+        return $this->json($file, 200, [], ['groups' => 'file:read']);
+    }
+
+    /**
      * @Route("/api/files/download/{url}", name="app_files_download")
      */
     public function download(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): BinaryFileResponse
@@ -156,8 +184,6 @@ class FilesController extends AbstractController
     }
 
     /**
-     * TO DO
-     *
      * @Route("/api/files/upload-from-url", name="app_files_upload_from_url")
      */
     public function uploadFromUrl(Request $request, LoggerInterface $logger, VirusScannerService $virusScannerService, MessageBusInterface $bus, ActionRepository $actionRepository): Response
@@ -304,8 +330,6 @@ class FilesController extends AbstractController
     }
 
     /**
-     * TO DO
-     *
      * @Route("/api/files/convert/{fileId}/{convertTo}", name="app_files_convert")
      */
     public function convert(Request $request, FileConverterService $converter): Response
@@ -372,5 +396,15 @@ class FilesController extends AbstractController
         $file->setActionsRequested([$actionRequested]);
 
         return $actionRequested;
+    }
+
+    private function hydrateFile(Request $request, HostedFile $file)
+    {
+        $data = json_decode($request->getContent(), true);
+        empty($data['description']) ? true : $file->setDescription($data['description']);
+        empty($data['virtualDirectory']) ? true : $file->setVirtualDirectory($data['virtualDirectory']);
+        empty($data['description']) ? true : $file->setDescription($data['description']);
+
+        return $file;
     }
 }
