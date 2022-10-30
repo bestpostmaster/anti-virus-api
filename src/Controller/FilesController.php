@@ -70,7 +70,7 @@ class FilesController extends AbstractController
         $fileSize = round(filesize($this->hostingDirectory.$name) / 1000000, 4);
 
         if (!$this->checkUserCanUpload($currentUser, $fileSize)) {
-            return $this->json([], 200, ['upload' => 'ko', 'message' => 'NotEnoughStorageSpace Exception']);
+            return $this->json(['error' => '0073', 'message' => 'NotEnoughStorageSpace Exception']);
         }
 
         $file = new HostedFile();
@@ -200,7 +200,7 @@ class FilesController extends AbstractController
         $fileSize = round(filesize($this->hostingDirectory.$name) / 1000000, 4);
 
         if (!$this->checkUserCanUpload($currentUser, $fileSize)) {
-            return $this->json([], 200, ['upload' => 'ko', 'message' => 'NotEnoughStorageSpace Exception']);
+            return $this->json(['error' => '0073', 'message' => 'NotEnoughStorageSpace Exception']);
         }
 
         $file = new HostedFile();

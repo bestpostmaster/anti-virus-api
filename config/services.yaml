@@ -18,7 +18,7 @@ services:
         bind:
             $projectDirectory: '%kernel.project_dir%'
             $hostingDirectory: '%env(resolve:HOSTING_DIRECTORY)%'
-            $quarantineDirectory: '%env(resolve:QUARANTINE_DIRECTORY)%'
+            $actionsResultsDirectory: '%env(resolve:ACTIONS_RESULTS_DIRECTORY)%'
             $adminPassword: '%env(resolve:ADMIN_PASSWORD)%'
             $defaultUserPassword: '%env(resolve:DEFAULT_USER_PASSWORD)%'
 

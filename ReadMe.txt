@@ -135,3 +135,8 @@ Update ClamAV database :
 sudo systemctl stop clamav-freshclam.service
 sudo freshclam
 sudo systemctl start clamav-freshclam.service
+
+Install Imagick :
+------------------------------------------------------------------
+sudo apt install imagemagick imagemagick-doc
+sudo apt install php8.0-imagick
