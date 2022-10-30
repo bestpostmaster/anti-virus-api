@@ -8,6 +8,7 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class StatusController extends AbstractController
 {
@@ -49,5 +50,19 @@ class StatusController extends AbstractController
         $free = explode(' ', $values)[5];
 
         return new Response($free);
+    }
+
+    /**
+     * @Route(
+     *     "/{_locale}/test-translator",
+     *     name="contact",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *     }
+     * )
+     */
+    public function showTranslationMessage(TranslatorInterface $translator): Response
+    {
+        return new Response($translator->trans('Symfony is great'));
     }
 }

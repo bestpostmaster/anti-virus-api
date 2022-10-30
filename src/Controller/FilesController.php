@@ -139,6 +139,53 @@ class FilesController extends AbstractController
     }
 
     /**
+     * @Route("/api/files/add-action-on-files", name="add_action_on_files")
+     */
+    public function addAction(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine, ActionRepository $actionRepository): Response
+    {
+        $userId = $this->getUser()->getId();
+        $data = json_decode($request->getContent(), true);
+        $files = $data['files'] ?? null;
+        $actionName = $data['actionName'] ?? null;
+        $parameters = $data['parameters'] ?? null;
+
+        if (!$files || !$actionName) {
+            throw new \Exception('Please provide files and actionName');
+        }
+
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            throw new \Exception('No user logged in');
+        }
+
+        $action = $actionRepository->findOneBy(['actionName' => $actionName]);
+
+        if (!$action) {
+            throw $this->createNotFoundException('Unknown action name : '.$request->get('actionName'));
+        }
+
+        foreach ($files as $id) {
+            if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+                $file = $hostedFileRepository->findOneBy(['id' => $id]);
+            } else {
+                $file = $hostedFileRepository->findOneBy(['id' => $id, 'user' => $userId]);
+            }
+
+            if (!$file) {
+                throw $this->createNotFoundException('Unknown file id : '.$request->get('fileId'));
+            }
+
+            $currentTime = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+            $this->createActionRequested($currentTime, $file, $action, $parameters);
+
+            $manager = $this->doctrine->getManager();
+            $manager->persist($file);
+            $manager->flush($file);
+        }
+
+        return $this->json(['files' => $files, 'actionName' => $actionName]);
+    }
+
+    /**
      * @Route("/api/files/download/{url}", name="app_files_download")
      */
     public function download(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): BinaryFileResponse
@@ -385,11 +432,11 @@ class FilesController extends AbstractController
         $manager->flush($user);
     }
 
-    public function createActionRequested(\DateTime $currentTime, HostedFile $file, Action $scanAction): ActionRequested
+    public function createActionRequested(\DateTime $currentTime, HostedFile $file, Action $scanAction, ?string $parameters = null): ActionRequested
     {
         $actionRequested = new ActionRequested();
         $actionRequested->setDateOfDemand($currentTime);
-        $actionRequested->setActionParameters('');
+        $actionRequested->setActionParameters($parameters ?? '');
         $actionRequested->setHostedFile($file);
         $actionRequested->setAction($scanAction);
         $actionRequested->setActionResults([]);
