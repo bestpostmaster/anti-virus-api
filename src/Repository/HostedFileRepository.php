@@ -77,4 +77,27 @@ class HostedFileRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    /**
+     * @return HostedFile[]
+     */
+    public function searchBy(array $data, array $orderBy, int $limit, int $offset): array
+    {
+        $orderIndex = array_key_first($orderBy);
+        $queryBuilder = $this->createQueryBuilder('f')
+            ->andWhere('f.description LIKE :expression OR f.name LIKE :expression OR f.url LIKE :expression')
+            ->setParameter('expression', '%'.$data['key'].'%')
+            ->orderBy('f.'.$orderIndex, $orderBy[$orderIndex])
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+        ;
+
+        if (isset($data['userId'])) {
+            $queryBuilder->andWhere('f.user = :userId')
+             ->setParameter('userId', $data['userId']);
+        }
+
+        return $queryBuilder->getQuery()
+                    ->getResult();
+    }
 }

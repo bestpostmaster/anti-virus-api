@@ -26,6 +26,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class FilesController extends AbstractController
 {
     protected const DEFAULT_LIMIT = 10;
+    protected const MAX_LIMIT = 200;
     protected const DEFAULT_OFFSET = 0;
     private string $hostingDirectory;
     private ManagerRegistry $doctrine;
@@ -394,6 +395,34 @@ class FilesController extends AbstractController
     }
 
     /**
+     * @Route("/api/files/search/{limit?}/{offset?}", name="search_files")
+     */
+    public function search(Request $request, HostedFileRepository $hostedFileRepository, string $hostingDirectory): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $key = $data['key'];
+
+        if (!$key || $key === '' || strlen($key) === 1) {
+            throw new \Exception('Please provide a valid key. Exemple {"key":"File description"}');
+        }
+
+        $userId = $this->getUser()->getId();
+        $this->hostingDirectory = $hostingDirectory;
+        $limit = (int) ($request->get('limit') ?? self::DEFAULT_LIMIT);
+        if ($limit > self::MAX_LIMIT) {
+            $limit = self::DEFAULT_LIMIT;
+        }
+        $offset = (int) ($request->get('offset') ?? self::DEFAULT_OFFSET);
+        $orderBy = ['id' => 'DESC'];
+
+        if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+            return $this->json($hostedFileRepository->searchBy(['key' => $key], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
+        }
+
+        return $this->json($hostedFileRepository->searchBy(['userId' => $userId, 'key' => $key], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
+    }
+
+    /**
      * @Route("/api/files/{limit?}/{offset?}", name="app_files")
      */
     public function index(Request $request, HostedFileRepository $hostedFileRepository, string $hostingDirectory): Response
@@ -401,6 +430,9 @@ class FilesController extends AbstractController
         $userId = $this->getUser()->getId();
         $this->hostingDirectory = $hostingDirectory;
         $limit = (int) ($request->get('limit') ?? self::DEFAULT_LIMIT);
+        if ($limit > self::MAX_LIMIT) {
+            $limit = self::DEFAULT_LIMIT;
+        }
         $offset = (int) ($request->get('offset') ?? self::DEFAULT_OFFSET);
         $orderBy = ['id' => 'DESC'];
 

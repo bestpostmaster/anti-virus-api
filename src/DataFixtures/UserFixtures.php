@@ -41,6 +41,7 @@ class UserFixtures extends Fixture
             $user = new User();
             $user->setLogin($item['login']);
             $user->setRoles($item['roles']);
+            $user->setEmailConfirmed(true);
             $user->setPassword($this->passwordEncoder->hashPassword(
                 $user,
                 $item['pass']
