@@ -54,6 +54,7 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
             $actionRequested->setActionParameters('-r --move='.$this->actionsResultsDirectory.' '.$this->hostingDirectory.$file->getName().' -l '.$logPath);
             $actionRequested->setHostedFileIds([]);
             $actionRequested->setActionResults([]);
+            $actionRequested->setUser($item['user']);
 
             $manager->persist($file);
             $manager->flush($file);

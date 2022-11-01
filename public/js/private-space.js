@@ -131,6 +131,11 @@ $(function() {
 					return;
 				}
 
+				if (element.relatedActions && !element.relatedActions[0]) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, '', '', '');
+					return;
+				}
+
 				var relatedActions = (element.relatedActions && element.relatedActions[0]) ? element.relatedActions[0] : 'No action';
 
 				tableMiddle += '<tr>\n' +
@@ -190,27 +195,33 @@ $(function() {
 		});
 
 		var appendElementsToList = function(elementsToAppend) {
+			console.log("Elements to append", elementsToAppend);
 			let trMiddle = '';
 			elementsToAppend.forEach(function(element, index, array)
 			{
 				lastOffset++;
 
-				if (element.actionsRequested && element.actionsRequested[0] && element.actionsRequested[0].accomplished === false) {
-					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'In progress..', '');
+				if (element.relatedActions && element.relatedActions[0] && element.relatedActions[0].accomplished === false) {
+					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'In progress..', '');
 					return;
 				}
 
-				if (element.actionsRequested && element.actionsRequested[0] && element.infected) {
-					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
+				if (element.relatedActions && element.relatedActions[0] && element.infected) {
+					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
 					return;
 				}
 
-				if (element.actionsRequested && element.actionsRequested[0] && !element.infected) {
-					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
+				if (element.relatedActions && element.relatedActions[0] && !element.infected) {
+					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
 					return;
 				}
+
+				trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, '', '', '');
 			});
-			$("#files").append(trMiddle);
+
+			if (trMiddle !== '') {
+				$("#files").append(trMiddle);
+			}
 		}
 
 		$('#load-more').click(function() {

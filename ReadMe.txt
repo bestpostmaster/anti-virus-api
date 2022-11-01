@@ -56,6 +56,7 @@ https://www.postman.com/collections/880b957ed4b9cdded6bf
 
 Run PHPUnit Tests
 -------------------------------------------------------------------
+rm -fr var/cache/*
 rm -f var/data.db
 php bin/console doctrine:database:create --env=test
 php bin/console doctrine:schema:drop --force --env=test

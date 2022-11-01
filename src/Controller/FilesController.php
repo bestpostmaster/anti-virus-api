@@ -483,6 +483,7 @@ class FilesController extends AbstractController
         $actionRequested->setActionParameters($parameters ?? '');
         $actionRequested->setHostedFileIds([['fileId' => $file->getId(), 'parameters' => '']]);
         $actionRequested->setAction($scanAction);
+        $actionRequested->setUser($this->getUser());
         $actionRequested->setActionResults([]);
 
         return $actionRequested;

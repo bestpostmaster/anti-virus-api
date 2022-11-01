@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\ActionRequestedRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -51,6 +52,11 @@ class ActionRequested
      * @groups("file:read")
      */
     private Action $action;
+
+    /** @ORM\ManyToOne(targetEntity=User::class, inversedBy="actionsRequested")
+     * @groups("file:read")
+     */
+    private UserInterface $user;
 
     /** @ORM\Column(type="boolean", nullable=false)
      * @groups("file:read")
@@ -151,4 +157,21 @@ class ActionRequested
     {
         $this->hostedFileIds = $hostedFileIds;
     }
+
+    /**
+     * @return UserInterface
+     */
+    public function getUser(): UserInterface
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param UserInterface $user
+     */
+    public function setUser(UserInterface $user): void
+    {
+        $this->user = $user;
+    }
+
 }

@@ -50,35 +50,42 @@ class VirusScannerService
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 
-        $actionDestination = $this->actionsResultsDirectory.DIRECTORY_SEPARATOR.$actionName;
+        $actionDestinationParent = $this->actionsResultsDirectory.DIRECTORY_SEPARATOR.$actionName;
+        if (!is_dir($actionDestinationParent) && !mkdir($actionDestinationParent) && !is_dir($actionDestinationParent)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $actionDestinationParent));
+        }
+
+        $actionDestination = $actionDestinationParent.DIRECTORY_SEPARATOR.$actionRequested->getId();
         if (!is_dir($actionDestination) && !mkdir($actionDestination) && !is_dir($actionDestination)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $actionDestination));
         }
 
-        $logPath = $actionDestination.DIRECTORY_SEPARATOR.$hostedFile->getName().'.log';
-        $commandParameters = '-r --move='.$this->actionsResultsDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$logPath;
+        $actionResultFileName = $hostedFile->getName().'.log';
+        $fullDestinationPath = $actionDestination.DIRECTORY_SEPARATOR.$hostedFile->getName().'.log';
+
+        $commandParameters = '-r --move='.$this->actionsResultsDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$fullDestinationPath;
         $actionRequested->setStartTime(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $actionRequested->setActionParameters($commandParameters);
         $fullCommandToRun = $actionRequested->getAction()->getCommandToRun().' '.$commandParameters;
 
         if ($this->kernelEnvironment === 'dev') {
-            $this->simulateScan($logPath);
+            $this->simulateScan($fullDestinationPath);
             $fullCommandToRun = 'ls';
         }
 
         exec($fullCommandToRun);
 
-        if (!file_exists($logPath)) {
-            throw new \RuntimeException(sprintf('Please check AntiVirus installation : '.$logPath.' command : '.'clamscan -r --move='.$this->actionsResultsDirectory.' '.$this->hostingDirectory.$hostedFile->getName().' -l '.$logPath));
+        if (!file_exists($fullDestinationPath)) {
+            throw new \RuntimeException(sprintf('Please check AntiVirus installation : '.$fullDestinationPath.' command : '.$fullCommandToRun));
         }
 
         $actionRequested->setEndTime(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $actionRequested->setAccomplished(true);
         $actionResults = $actionRequested->getActionResults();
-        $actionResults[] = $logPath;
+        $actionResults[] = $actionResultFileName;
         $actionRequested->setActionResults($actionResults);
-        $scanResult = file_get_contents($logPath);
-        $scanResult = str_replace([$actionDestination, $this->actionsResultsDirectory, $this->hostingDirectory, $hostedFile->getName()],
+        $scanResult = file_get_contents($fullDestinationPath);
+        $scanResult = str_replace([$actionDestinationParent, $this->actionsResultsDirectory, $this->hostingDirectory, $hostedFile->getName()],
             ['', '/actionsResultsDirectory/', '/', $hostedFile->getClientName()], $scanResult);
         $scanResult = '[REF : '.$hostedFile->getName()." ] \n".$scanResult;
 

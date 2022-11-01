@@ -138,6 +138,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /** @ORM\Column(type="string", nullable=true) */
     private string $secretTokenForValidation;
 
+    /** @ORM\OneToMany(targetEntity=ActionRequested::class, mappedBy="user") */
+    private $actionsRequested;
+
     public function getUserIdentifier(): string
     {
         return $this->login;
@@ -414,5 +417,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmailConfirmed(bool $emailConfirmed): void
     {
         $this->emailConfirmed = $emailConfirmed;
+    }
+
+    public function getActionsRequested()
+    {
+        return $this->actionsRequested;
+    }
+
+    public function setActionsRequested($actionsRequested): void
+    {
+        $this->actionsRequested = $actionsRequested;
     }
 }
