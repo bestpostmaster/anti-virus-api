@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\ActionRequested;
+use App\Repository\HostedFileRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 class VirusScannerService
@@ -14,23 +15,31 @@ class VirusScannerService
     private string $actionsResultsDirectory;
     private string $projectDirectory;
     private string $kernelEnvironment;
+    private HostedFileRepository $hostedFileRepository;
 
-    public function __construct(ManagerRegistry $doctrine, string $hostingDirectory, string $actionsResultsDirectory, string $projectDirectory, string $kernelEnvironment)
+    public function __construct(ManagerRegistry $doctrine, string $hostingDirectory, string $actionsResultsDirectory, string $projectDirectory, string $kernelEnvironment, HostedFileRepository $hostedFileRepository)
     {
         $this->doctrine = $doctrine;
         $this->hostingDirectory = $hostingDirectory;
         $this->actionsResultsDirectory = $actionsResultsDirectory;
         $this->projectDirectory = $projectDirectory;
         $this->kernelEnvironment = $kernelEnvironment;
+        $this->hostedFileRepository = $hostedFileRepository;
     }
 
     public function runCommand(ActionRequested $actionRequested): void
     {
-        $hostedFile = $actionRequested->getHostedFile();
+        $hostedFiles = $actionRequested->getHostedFileIds();
         $actionName = $actionRequested->getAction()->getActionName();
 
+        if (empty($hostedFiles) || count($hostedFiles) !== 1) {
+            var_dump($hostedFiles);
+            throw new \RuntimeException('VirusScannerService, File not found');
+        }
+
+        $hostedFile = $this->hostedFileRepository->findOneBy(['id' => $hostedFiles[0]['fileId']]);
         if (!$hostedFile) {
-            throw new \RuntimeException('VirusScannerService, File not fount');
+            throw new \RuntimeException('VirusScannerService, file is deleted');
         }
 
         if (!$actionName) {

@@ -17,7 +17,7 @@ $(function() {
 		elements.forEach(function(element, index, array)
 		{
 			if ($("#file-details-"+element.id)) {
-				if (element.actionsRequested[0] && element.actionsRequested[0].accomplished === true) {
+				if (element.relatedActions && element.relatedActions[0] && element.relatedActions[0].accomplished === true) {
 					$("#file-action-status-"+element.id).html('Done');
 					if (element.infected) {
 						$("#file-action-result-"+element.id).html('<b style="color: darkred">!!>Infected!</b>');
@@ -116,27 +116,27 @@ $(function() {
 				lastOffset++;
 				let description = '<input type="button" value="'+(element.description).slice(-25)+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
 
-				if (element.actionsRequested[0] && element.actionsRequested[0].accomplished === false) {
-					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'In progress..', '');
+				if (element.relatedActions && element.relatedActions[0] && element.relatedActions[0].accomplished === false) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'In progress..', '');
 					return;
 				}
 
-				if (element.actionsRequested[0] && element.infected) {
-					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
+				if (element.relatedActions && element.relatedActions[0] && element.infected) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
 					return;
 				}
 
-				if (element.actionsRequested[0] && !element.infected) {
-					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
+				if (element.relatedActions && element.relatedActions[0] && !element.infected) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
 					return;
 				}
 
-				var actionsRequested = element.actionsRequested[0] ? element.actionsRequested[0] : 'No action';
+				var relatedActions = (element.relatedActions && element.relatedActions[0]) ? element.relatedActions[0] : 'No action';
 
 				tableMiddle += '<tr>\n' +
 					'				<td>'+description+'</td>\n' +
-					'				<td>'+actionsRequested+'</td>\n' +
-					'				<td>'+actionsRequested+'</td>\n' +
+					'				<td>'+relatedActions+'</td>\n' +
+					'				<td>'+relatedActions+'</td>\n' +
 					'				<td></td>\n' +
 					'			</tr>\n'
 			}
@@ -150,7 +150,19 @@ $(function() {
 			let url = '/api/files/download/'+$(this).attr('url');
 
 			var showFile = function (blob) {
-				const data = window.URL.createObjectURL(blob);
+
+				var data = '';
+
+				try {
+					var binaryData = [];
+					binaryData.push(blob);
+					data = window.URL.createObjectURL(new Blob(binaryData));
+				}  catch (error) {
+					console.error(error);
+					alert('This file can not be downloaded');
+					return;
+				}
+
 				var link = document.createElement('a');
 				link.href = data;
 				link.download = fileName;
@@ -171,6 +183,7 @@ $(function() {
 				type:'GET',
 				url:url
 			}).done(function(blob){
+				console.log('BLOB Received : ', blob);
 				showFile(blob);
 			});
 
@@ -182,17 +195,17 @@ $(function() {
 			{
 				lastOffset++;
 
-				if (element.actionsRequested[0].accomplished === false) {
+				if (element.actionsRequested && element.actionsRequested[0] && element.actionsRequested[0].accomplished === false) {
 					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'In progress..', '');
 					return;
 				}
 
-				if (element.infected) {
+				if (element.actionsRequested && element.actionsRequested[0] && element.infected) {
 					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
 					return;
 				}
 
-				if (!element.infected) {
+				if (element.actionsRequested && element.actionsRequested[0] && !element.infected) {
 					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.actionsRequested[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
 					return;
 				}

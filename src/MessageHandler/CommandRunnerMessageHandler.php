@@ -46,8 +46,13 @@ final class CommandRunnerMessageHandler implements MessageHandlerInterface
 
         $actionRequested = $this->em->find(ActionRequested::class, $message->getActionRequestedId());
 
+        if (!$actionRequested) {
+            return;
+        }
+
         switch ($actionRequested->getAction()->getActionName()) {
             case 'Scan':
+                echo 'Action Id '.$actionRequested->getId().' '.$actionRequested->getAction()->getActionName().'.. ';
                 $this->virusScannerService->runCommand($actionRequested);
                 break;
         }

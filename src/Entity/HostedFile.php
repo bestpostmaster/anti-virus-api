@@ -129,20 +129,8 @@ class HostedFile
      */
     private array $authorizedUsers;
 
-    /** @ORM\OneToMany(targetEntity=ActionRequested::class, mappedBy="hostedFile", cascade={"persist", "remove"})
-     * @groups("file:read")
-     */
-    private $actionsRequested;
-
-    public function getActionsRequested()
-    {
-        return $this->actionsRequested;
-    }
-
-    public function setActionsRequested(array $actionsRequested): void
-    {
-        $this->actionsRequested = $actionsRequested;
-    }
+    /** @groups("file:read") */
+    private array $relatedActions = [];
 
     public function getId(): ?int
     {
@@ -355,5 +343,15 @@ class HostedFile
     public function setScanResult(?string $scanResult): void
     {
         $this->scanResult = $scanResult;
+    }
+
+    public function getRelatedActions(): array
+    {
+        return $this->relatedActions;
+    }
+
+    public function setRelatedActions(array $relatedActions): void
+    {
+        $this->relatedActions = $relatedActions;
     }
 }

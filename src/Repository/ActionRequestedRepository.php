@@ -49,32 +49,15 @@ class ActionRequestedRepository extends ServiceEntityRepository
         }
     }
 
-    // /**
-    //  * @return ActionRequested[] Returns an array of ActionRequested objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findRelatedActions(int $fileId)
     {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('h.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
+        $queryBuilder = $this->createQueryBuilder('f')
+            ->andWhere('f.hostedFileIds LIKE :expression')
+            ->setParameter('expression', '%'.'"fileId":'.$fileId.'%')
+            ->orderBy('f.id', 'ASC')
         ;
-    }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?ActionRequested
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        return $queryBuilder->getQuery()
+            ->getResult();
     }
-    */
 }

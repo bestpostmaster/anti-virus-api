@@ -93,11 +93,15 @@ class FilesController extends AbstractController
             throw new \Exception('Please create scan action raw!');
         }
 
-        $actionRequested = $this->createActionRequested($currentTime, $file, $scanAction);
-
         $manager = $this->doctrine->getManager();
         $manager->persist($file);
         $manager->flush($file);
+
+        $actionRequested = $this->createActionRequested($currentTime, $file, $scanAction);
+
+        $manager = $this->doctrine->getManager();
+        $manager->persist($actionRequested);
+        $manager->flush($actionRequested);
 
         $this->increaseUserSpace($currentUser, $fileSize);
 
@@ -142,7 +146,7 @@ class FilesController extends AbstractController
     /**
      * @Route("/api/files/add-action-on-files", name="add_action_on_files")
      */
-    public function addAction(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine, ActionRepository $actionRepository): Response
+    public function addAction(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine, ActionRepository $actionRepository, MessageBusInterface $bus): Response
     {
         $userId = $this->getUser()->getId();
         $data = json_decode($request->getContent(), true);
@@ -176,11 +180,13 @@ class FilesController extends AbstractController
             }
 
             $currentTime = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
-            $this->createActionRequested($currentTime, $file, $action, $parameters);
+            $actionRequested = $this->createActionRequested($currentTime, $file, $action, $parameters);
 
             $manager = $this->doctrine->getManager();
-            $manager->persist($file);
-            $manager->flush($file);
+            $manager->persist($actionRequested);
+            $manager->flush($actionRequested);
+
+            $bus->dispatch(new CommandRunnerMessage($actionRequested->getId()));
         }
 
         return $this->json(['files' => $files, 'actionName' => $actionName]);
@@ -336,6 +342,8 @@ class FilesController extends AbstractController
             throw $this->createNotFoundException('The file does not exist');
         }
 
+        $this->addActionsRequestedList($result, $hostedFileRepository);
+
         return $this->json($result, 200, [], ['groups' => 'file:read']);
     }
 
@@ -437,10 +445,14 @@ class FilesController extends AbstractController
         $orderBy = ['id' => 'DESC'];
 
         if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-            return $this->json($hostedFileRepository->findBy([], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
+            $hostedFiles = $this->addActionsRequestedListToMultipleFiles($hostedFileRepository->findBy([], $orderBy, $limit, $offset), $hostedFileRepository);
+
+            return $this->json($hostedFiles, 200, [], ['groups' => 'file:read']);
         }
 
-        return $this->json($hostedFileRepository->findBy(['user' => $userId], $orderBy, $limit, $offset), 200, [], ['groups' => 'file:read']);
+        $hostedFiles = $this->addActionsRequestedListToMultipleFiles($hostedFileRepository->findBy(['user' => $userId], $orderBy, $limit, $offset), $hostedFileRepository);
+
+        return $this->json($hostedFiles, 200, [], ['groups' => 'file:read']);
     }
 
     private function checkUserCanUpload(User $user, float $fileSize): bool
@@ -469,10 +481,9 @@ class FilesController extends AbstractController
         $actionRequested = new ActionRequested();
         $actionRequested->setDateOfDemand($currentTime);
         $actionRequested->setActionParameters($parameters ?? '');
-        $actionRequested->setHostedFile($file);
+        $actionRequested->setHostedFileIds([['fileId' => $file->getId(), 'parameters' => '']]);
         $actionRequested->setAction($scanAction);
         $actionRequested->setActionResults([]);
-        $file->setActionsRequested([$actionRequested]);
 
         return $actionRequested;
     }
@@ -485,5 +496,20 @@ class FilesController extends AbstractController
         empty($data['description']) ? true : $file->setDescription($data['description']);
 
         return $file;
+    }
+
+    private function addActionsRequestedList(HostedFile $hostedFile, HostedFileRepository $hostedFileRepository)
+    {
+        $result = $hostedFileRepository->findRelatedActions($hostedFile->getId());
+        $hostedFile->setRelatedActions($result);
+    }
+
+    private function addActionsRequestedListToMultipleFiles(array $hostedFiles, HostedFileRepository $hostedFileRepository): array
+    {
+        foreach ($hostedFiles as $file) {
+            $this->addActionsRequestedList($file, $hostedFileRepository);
+        }
+
+        return $hostedFiles;
     }
 }

@@ -52,9 +52,8 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
             $varLog = DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR;
             $logPath = $this->projectDirectory.$varLog.$file->getName().'-ScanResult.log';
             $actionRequested->setActionParameters('-r --move='.$this->actionsResultsDirectory.' '.$this->hostingDirectory.$file->getName().' -l '.$logPath);
-            $actionRequested->setHostedFile($file);
+            $actionRequested->setHostedFileIds([]);
             $actionRequested->setActionResults([]);
-            $file->setActionsRequested([$actionRequested]);
 
             $manager->persist($file);
             $manager->flush($file);

@@ -42,8 +42,10 @@ class ActionRequested
      */
     private ?\DateTimeInterface $endTime;
 
-    /** @ORM\ManyToOne(targetEntity=HostedFile::class, inversedBy="actionsRequested") */
-    private HostedFile $hostedFile;
+    /** @ORM\Column(type="json", nullable=false)
+     * @groups("file:read")
+     */
+    private array $hostedFileIds;
 
     /** @ORM\ManyToOne(targetEntity=Action::class, inversedBy="actionsRequested")
      * @groups("file:read")
@@ -110,16 +112,6 @@ class ActionRequested
         $this->endTime = $endTime;
     }
 
-    public function getHostedFile(): ?HostedFile
-    {
-        return $this->hostedFile;
-    }
-
-    public function setHostedFile(HostedFile $hostedFile): void
-    {
-        $this->hostedFile = $hostedFile;
-    }
-
     public function isAccomplished(): bool
     {
         return $this->accomplished;
@@ -148,5 +140,15 @@ class ActionRequested
     public function setAction(Action $action): void
     {
         $this->action = $action;
+    }
+
+    public function getHostedFileIds(): array
+    {
+        return $this->hostedFileIds;
+    }
+
+    public function setHostedFileIds(array $hostedFileIds): void
+    {
+        $this->hostedFileIds = $hostedFileIds;
     }
 }

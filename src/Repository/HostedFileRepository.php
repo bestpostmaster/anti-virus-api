@@ -20,9 +20,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class HostedFileRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private ActionRequestedRepository $actionRequestedRepository;
+
+    public function __construct(ManagerRegistry $registry, ActionRequestedRepository $actionRequestedRepository)
     {
         parent::__construct($registry, HostedFile::class);
+        $this->actionRequestedRepository = $actionRequestedRepository;
     }
 
     /**
@@ -49,35 +52,6 @@ class HostedFileRepository extends ServiceEntityRepository
         }
     }
 
-    // /**
-    //  * @return HostedFile[] Returns an array of HostedFile objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('h.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?HostedFile
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
-
     /**
      * @return HostedFile[]
      */
@@ -99,5 +73,10 @@ class HostedFileRepository extends ServiceEntityRepository
 
         return $queryBuilder->getQuery()
                     ->getResult();
+    }
+
+    public function findRelatedActions(int $fileId): array
+    {
+        return $this->actionRequestedRepository->findRelatedActions($fileId);
     }
 }
