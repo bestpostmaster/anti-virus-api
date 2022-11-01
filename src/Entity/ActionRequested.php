@@ -22,7 +22,7 @@ class ActionRequested
      */
     private int $id;
 
-    /** @ORM\Column(type="text", length=2000, nullable=true) */
+    /** @ORM\Column(type="text", length=20000, nullable=true) */
     private ?string $actionParameters;
 
     /**
