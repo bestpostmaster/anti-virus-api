@@ -193,6 +193,22 @@ class FilesController extends AbstractController
     }
 
     /**
+     * @Route(
+     *     "/{_locale}/free/{serviceDescription}",
+     *     name="service",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *     }
+     * )
+     */
+    public function service(Request $request): Response
+    {
+        return $this->render('app/index.html.twig', [
+            'lang' => $request->get('_locale')
+        ]);
+    }
+
+    /**
      * @Route("/api/files/download/{url}", name="app_files_download")
      */
     public function download(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine): BinaryFileResponse
@@ -304,11 +320,15 @@ class FilesController extends AbstractController
             throw new \Exception('Please create scan action raw!');
         }
 
-        $actionRequested = $this->createActionRequested($currentTime, $file, $scanAction);
-
         $manager = $this->doctrine->getManager();
         $manager->persist($file);
         $manager->flush($file);
+
+        $actionRequested = $this->createActionRequested($currentTime, $file, $scanAction);
+
+        $manager = $this->doctrine->getManager();
+        $manager->persist($actionRequested);
+        $manager->flush($actionRequested);
 
         $this->increaseUserSpace($currentUser, $fileSize);
 

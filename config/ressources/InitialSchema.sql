@@ -52,7 +52,7 @@ INSERT INTO `action` (`id`, `action_name`, `command_to_run`, `enabled`) VALUES
 CREATE TABLE `action_requested` (
                                     `id` int(11) NOT NULL,
                                     `hosted_file_id` int(11) DEFAULT NULL,
-                                    `action_parameters` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                                    `action_parameters` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
                                     `date_of_demand` datetime NOT NULL,
                                     `start_time` datetime DEFAULT NULL,
                                     `end_time` datetime DEFAULT NULL,

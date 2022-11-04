@@ -51,7 +51,7 @@ $(function() {
 
 					$.ajax({   	
 				      	type: "POST",
-				      	url: "api/login_check",
+				      	url: "/api/login_check",
 						contentType: "application/json",
 						dataType: "json",
 						data: JSON.stringify(getFormData($(form))),
@@ -119,7 +119,7 @@ $(function() {
 
 					$.ajax({
 						type: "POST",
-						url: "api/users/register",
+						url: "/"+LANG+"/users/register",
 						contentType: "application/json",
 						dataType: "json",
 						data: JSON.stringify(getFormData($(form))),
@@ -161,7 +161,7 @@ $(function() {
 
 			$.ajax({
 				type: "POST",
-				url: "/api_refresh_token",
+				url: "/api/refresh-token",
 				contentType: "application/json",
 				dataType: "json",
 				data: '{"refresh_token":"'+sessionStorage.getItem('refreshToken')+'"}',

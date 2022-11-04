@@ -3,7 +3,7 @@ function initRefreshTokenCalls() {
 
         $.ajax({
             type: "POST",
-            url: "/api_refresh_token",
+            url: "/api/refresh-token",
             contentType: "application/json",
             dataType: "json",
             data: '{"refresh_token":"'+sessionStorage.getItem('refreshToken')+'"}',

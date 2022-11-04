@@ -9,6 +9,7 @@ parameters:
     webSiteDomainName: '%env(resolve:WEB_SITE_DOMAIN_NAME)%'
     webSiteHomeUrl: '%env(resolve:WEB_SITE_HOME_URL)%'
     webSiteEmailAddress: '%env(resolve:WEB_SITE_EMAIL_ADDRESS)%'
+    languages_list: 'en|fr|de|es|zh|ar|hi|en'
 
 services:
     # default configuration for services in *this* file

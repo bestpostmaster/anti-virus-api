@@ -26,7 +26,7 @@ security:
             entry_point: jwt
             jwt: ~
             refresh_jwt:
-                check_path: /api_refresh_token # or, you may use the `api_refresh_token` route name
+                check_path: /api/refresh-token # or, you may use the `api_refresh_token` route name
 
         main:
             lazy: true
@@ -41,19 +41,25 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/public,       roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api_refresh_token, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/home, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/status, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/vmstat, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/test-translator, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/users/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/users/confirm-email-address, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/test-email, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/,       roles: PUBLIC_ACCESS }
+
+        #API END-POINTS
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/refresh-token, roles: PUBLIC_ACCESS }
         - { path: ^/api/admin,       roles: ROLE_ADMIN }
         - { path: ^/api/files,       roles: ROLE_USER }
         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+
+        #TEST END-POINTS
+        - { path: ^/(%languages_list%)/status, roles: PUBLIC_ACCESS }
+        - { path: ^/(%languages_list%)/vmstat, roles: PUBLIC_ACCESS }
+        - { path: ^/(%languages_list%)/test-email, roles: PUBLIC_ACCESS }
+
+        #FRONT PAGES
+        - { path: ^/(%languages_list%), roles: PUBLIC_ACCESS }
+        - { path: ^/(%languages_list%)/test-translator, roles: PUBLIC_ACCESS }
+        - { path: ^/(%languages_list%)/users/register, roles: PUBLIC_ACCESS }
+        - { path: ^/(%languages_list%)/users/confirm-email-address, roles: PUBLIC_ACCESS }
 
 when@test:
     security:

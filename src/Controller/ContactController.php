@@ -33,16 +33,29 @@ class ContactController extends AbstractController
     }
 
     /**
-     * @Route("/contact", name="contact")
+     * @Route(
+     *     "/{_locale}/contact",
+     *     name="contact",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *     }
+     * )
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         return $this->render('app/contact.html.twig', [
+            'lang' => $request->get('_locale')
         ]);
     }
 
     /**
-     * @Route("/send-contact-message", name="send-contact-message")
+     * @Route(
+     *     "/{_locale}/send-contact-message",
+     *     name="send-contact-message",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *     }
+     * )
      */
     public function sendContactMessage(Request $request): Response
     {

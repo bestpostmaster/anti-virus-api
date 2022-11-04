@@ -1,43 +1,39 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     {%  include 'app/common-head-tags.html.twig' %}
 
-    <title>Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
-    <meta name="description" content="Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
+    <title>{{ 'TR00001' | trans }}</title>
+    <meta name="description" content="{{ 'TR00002' | trans }}">
 </head>
 <body>
 
-
 <div class="content">
-
     <div class="container">
-
-
         <div class="row justify-content-center">
             <div class="col-md-10">
 
                 <div class="row align-items-center">
                     <div class="col-lg-7 mb-5 mb-lg-0">
 
-                        <h2 class="mb-5" id="h-top">Analyse suspicious files, domains, IPs and URLs</h2>
+                        <h2 class="mb-5" id="h-top">{{ 'TR00003' | trans }}</h2>
                         <form class="border-right pr-5 mb-5" method="post" id="loginForm" name="contactForm">
                             <div class="row">
                                 <div class="col-md-12 form-group">
-                                    <input type="text" class="form-control" name="username" id="username" placeholder="Login">
+                                    <input type="text" class="form-control" name="username" id="username" placeholder="{{ 'Login' | trans }}">
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-12 form-group">
-                                    <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                                    <input type="password" class="form-control" name="password" id="password" placeholder="{{ 'Password' | trans }}">
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-12">
-                                    <input type="submit" value="Login" class="btn btn-primary rounded-0 py-2 px-4">
-                                    <span class="submitting"></span>
+                                    <input type="submit" value="{{ 'Login' | trans }}" class="btn btn-primary rounded-0 py-2 px-4">
+                                    <span class="{{ 'submitting' | trans }}"></span>
                                 </div>
                             </div>
                         </form>
@@ -47,20 +43,20 @@
                             <form class="border-right pr-5 mb-5" method="post" id="uploadForm" name="uploadForm">
                                 <div class="row">
                                     <div class="col-md-12 form-group">
-                                        <label for="avatar">Choose the file to scan:</label>
+                                        <label for="avatar">{{ 'Choose the file to scan:' | trans }}</label>
                                         <input type="file" id="file" name="file">
                                         <hr>
 
                                         <div class="row">
                                             <div class="col-md-12 form-group">
-                                                <input type="text" class="form-control" name="description" id="description" placeholder="Description">
+                                                <input type="text" class="form-control" name="description" id="description" placeholder="{{ 'Description' | trans }}">
                                             </div>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <input type="submit" value="Start analysis" class="btn btn-primary rounded-0 py-2 px-4">
-                                                <span class="submitting"></span>
+                                                <input type="submit" value="{{ 'Start analysis' | trans }}" class="btn btn-primary rounded-0 py-2 px-4">
+                                                <span class="{{ 'submitting' | trans }}"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -69,9 +65,9 @@
                             <div id="form-upload-success">
                                 <div class="row">
                                     <div class="col-md-12 form-group">
-                                        <label for="avatar">Upload successful. <br>
-                                            You will receive a notification after the virus scan is complete</label><br>
-                                        <input type="submit" id="uploadAnotherFile" value="Upload another file" class="btn btn-primary rounded-0 py-2 px-4">
+                                        <label for="avatar">{{ 'Upload successful.' | trans }} <br>
+                                        {{ 'You will receive a notification after the virus scan is complete' | trans }}</label><br>
+                                        <input type="submit" id="uploadAnotherFile" value="{{ 'Upload another file' | trans }}" class="btn btn-primary rounded-0 py-2 px-4">
                                     </div>
                                 </div>
                             </div>
@@ -85,15 +81,15 @@
 
                     </div>
                     <div class="col-lg-4 ml-auto">
-                        <p><a href="/create-account" id="link-test-free">Test this API for free</a></p>
-                        <h3 class="mb-4">API for developers [JSON / REST API]</h3>
-                        <p>Start scanning user uploaded content and files within minutes. Our JSON API is easy to integrate and quickly lets you scan without overloading your servers.</p>
-                        <p><a href="/documentation">Read more</a></p><br><br>
-                        <p><a href="/create-account">Create an account for free</a></p>
-                        <p><a href="https://en.wikipedia.org/wiki/JSON_Web_Token" target="_blank">JSON Web Token</a></p>
-                        <p><a href="#">Terms of use</a></p>
-                        <p><a href="#">Cookies and personal data</a></p>
-                        <p><a href="/contact">Contact us</a></p>
+                        <p><a href="/{{ lang }}/create-account" id="link-test-free">{{ 'Test this API for free' | trans }}</a></p>
+                        <h3 class="mb-4">{{ 'API for developers [JSON / REST API]' | trans }}</h3>
+                        <p>{{ 'Start scanning user uploaded content and files within minutes. Our JSON API is easy to integrate and quickly lets you scan without overloading your servers.' | trans }}</p>
+                        <p><a href="/{{ lang }}/documentation">{{ 'Read more' | trans }}</a></p><br><br>
+                        <p><a href="/{{ lang }}/create-account">{{ 'Create an account for free' | trans }}</a></p>
+                        <p><a href="https://en.wikipedia.org/wiki/JSON_Web_Token" target="_blank">{{ 'JSON Web Token' | trans }}</a></p>
+                        <p><a href="#">{{ 'Terms of use' | trans }}</a></p>
+                        <p><a href="#">{{ 'Cookies and personal data' | trans }}</a></p>
+                        <p><a href="/{{ lang }}/contact">{{ 'Contact us' | trans }}</a></p>
                     </div>
                 </div>
             </div>
@@ -103,7 +99,7 @@
 
 {%  include 'app/common-js-sources.html.twig' %}
 
-<script src="js/index.js"></script>
+<script src="/js/index.js"></script>
 
 </body>
 </html>

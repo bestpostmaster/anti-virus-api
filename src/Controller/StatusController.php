@@ -55,7 +55,7 @@ class StatusController extends AbstractController
     /**
      * @Route(
      *     "/{_locale}/test-translator",
-     *     name="contact",
+     *     name="test-translator",
      *     requirements={
      *         "_locale": "en|fr|de|es|zh|ar|hi|en",
      *     }

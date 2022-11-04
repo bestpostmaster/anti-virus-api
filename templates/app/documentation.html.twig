@@ -27,7 +27,7 @@
                                 <b>This API is simple to use. You just have to follow these steps</b><br><br>
 
                                 <ul>
-                                    <li><a href="/create-account">Create a free account</a></li>
+                                    <li><a href="/{{ lang }}/create-account">Create a free account</a></li>
                                     <li>Click on the link you receive by email to confirm your address</li>
                                     <li>Generate a token with credentials</li>
 
@@ -68,12 +68,12 @@
                         </div>
                     </div>
                     <div class="col-lg-4 ml-auto">
-                        <p><a href="/">Home page</a></p>
-                        <p><a href="/create-account">Create an account for free</a></p>
+                        <p><a href="/{{ lang }}/">Home page</a></p>
+                        <p><a href="/{{ lang }}/create-account">Create an account for free</a></p>
                         <p><a href="https://en.wikipedia.org/wiki/JSON_Web_Token">JSON Web Token</a></p>
                         <p><a href="#">Terms of use</a></p>
                         <p><a href="#">Cookies and personal data</a></p>
-                        <p><a href="/contact">Contact us</a></p>
+                        <p><a href="/{{ lang }}/contact">Contact us</a></p>
                     </div>
                 </div>
             </div>
@@ -84,6 +84,6 @@
 
 {%  include 'app/common-js-sources.html.twig' %}
 
-<script src="js/documentation.js"></script>
+<script src="/js/documentation.js"></script>
 </body>
 </html>

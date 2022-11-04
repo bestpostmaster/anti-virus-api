@@ -2,7 +2,7 @@ api_login_check:
   path: /api/login_check
 
 api_refresh_token:
-  path: /api_refresh_token
+  path: /api/refresh-token
 
 home:
   path: /api/home

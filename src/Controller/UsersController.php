@@ -81,7 +81,13 @@ class UsersController extends AbstractController
     }
 
     /**
-     * @Route("/api/users/confirm-email-address/{secret}", name="confirm_email_address")
+     * @Route(
+     *     "/{_locale}/users/confirm-email-address/{secret}",
+     *     name="confirm_email_address",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *     }
+     * )
      */
     public function confirmEmailAddress(Request $request, ManagerRegistry $doctrine, UserRepository $userRepository): Response
     {
@@ -98,6 +104,7 @@ class UsersController extends AbstractController
 
         return $this->render('app/confirm-email.html.twig', [
             'user' => $user,
+            'lang' => $request->get('_locale')
         ]);
     }
 
@@ -130,7 +137,13 @@ class UsersController extends AbstractController
     }
 
     /**
-     * @Route("/api/users/register", name="app_users_register")
+     * @Route(
+     *     "/{_locale}/users/register",
+     *     name="app_users_register",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *     }
+     * )
      */
     public function registerFromFront(Request $request, ManagerRegistry $doctrine, MailerInterface $mailer, UserRepository $userRepository): Response
     {
@@ -176,6 +189,7 @@ class UsersController extends AbstractController
             ->htmlTemplate('app/mails/confirm-email.html.twig')
             ->context([
                 'link' => $link,
+                'lang' => $request->get('_locale')
             ]);
 
         $mailer->send($email);
