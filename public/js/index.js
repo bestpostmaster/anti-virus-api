@@ -19,7 +19,7 @@ $(function() {
 		sessionStorage.getItem('refreshToken');
 
 		if (sessionExists()) {
-			window.location.href = "/private-space";
+			window.location.href = "/"+LANG+"/private-space";
 		}
 
 		if ($('#loginForm').length > 0 ) {
@@ -64,7 +64,7 @@ $(function() {
 						   sessionStorage.setItem('token', response.token);
 						   sessionStorage.setItem('refreshToken', response.refresh_token);
 						   initRefreshTokenCalls();
-						   window.location.href = "/private-space";
+						   window.location.href = "/"+LANG+"/private-space";
 					  } else if (response.error && response.message){
 						   $('#form-message-warning').html(response.message)
 							   .fadeIn();

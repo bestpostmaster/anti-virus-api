@@ -104,7 +104,7 @@ class UsersController extends AbstractController
 
         return $this->render('app/confirm-email.html.twig', [
             'user' => $user,
-            'lang' => $request->get('_locale')
+            'lang' => $request->get('_locale'),
         ]);
     }
 
@@ -189,7 +189,7 @@ class UsersController extends AbstractController
             ->htmlTemplate('app/mails/confirm-email.html.twig')
             ->context([
                 'link' => $link,
-                'lang' => $request->get('_locale')
+                'lang' => $request->get('_locale'),
             ]);
 
         $mailer->send($email);

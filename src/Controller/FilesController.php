@@ -40,7 +40,7 @@ class FilesController extends AbstractController
     /**
      * @Route("/api/files/upload", name="app_files_upload")
      */
-    public function upload(Request $request, LoggerInterface $logger, MessageBusInterface $bus, ActionRepository $actionRepository): Response
+    public function upload(Request $request, LoggerInterface $logger, MessageBusInterface $bus, ActionRepository $actionRepository, HostedFileRepository $hostedFileRepository): Response
     {
         if (empty($request->files) || !$request->files->get('file')) {
             throw new \Exception('No file sent');
@@ -109,6 +109,8 @@ class FilesController extends AbstractController
         // $virusScannerService->scan($file);
 
         $bus->dispatch(new CommandRunnerMessage($actionRequested->getId()));
+
+        $this->addActionsRequestedList($file, $hostedFileRepository);
 
         return $this->json($file, 200, [], ['groups' => 'file:read']);
     }
@@ -189,7 +191,7 @@ class FilesController extends AbstractController
             $bus->dispatch(new CommandRunnerMessage($actionRequested->getId()));
         }
 
-        return $this->json(['files' => $files, 'actionName' => $actionName]);
+        return $this->json(['actionId' => $actionRequested->getId(), 'files' => $files, 'actionName' => $actionName]);
     }
 
     /**
@@ -204,7 +206,7 @@ class FilesController extends AbstractController
     public function service(Request $request): Response
     {
         return $this->render('app/index.html.twig', [
-            'lang' => $request->get('_locale')
+            'lang' => $request->get('_locale'),
         ]);
     }
 
@@ -256,7 +258,7 @@ class FilesController extends AbstractController
     /**
      * @Route("/api/files/upload-from-url", name="app_files_upload_from_url")
      */
-    public function uploadFromUrl(Request $request, LoggerInterface $logger, VirusScannerService $virusScannerService, MessageBusInterface $bus, ActionRepository $actionRepository): Response
+    public function uploadFromUrl(Request $request, LoggerInterface $logger, VirusScannerService $virusScannerService, MessageBusInterface $bus, ActionRepository $actionRepository, HostedFileRepository $hostedFileRepository): Response
     {
         if (!$request->get('url')) {
             throw new \Exception('No url sent');
@@ -336,6 +338,8 @@ class FilesController extends AbstractController
         // $virusScannerService->scan($file);
 
         $bus->dispatch(new CommandRunnerMessage($actionRequested->getId()));
+
+        $this->addActionsRequestedList($file, $hostedFileRepository);
 
         return $this->json($file, 200, [], ['groups' => 'file:read']);
     }

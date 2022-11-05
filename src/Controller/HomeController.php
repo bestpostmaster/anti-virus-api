@@ -25,7 +25,7 @@ class HomeController extends AbstractController
     public function englishHome(): Response
     {
         return $this->render('app/index.html.twig', [
-            'lang' => 'en'
+            'lang' => 'en',
         ]);
     }
 
@@ -41,7 +41,7 @@ class HomeController extends AbstractController
     public function allLanguagesHome(Request $request): Response
     {
         return $this->render('app/index.html.twig', [
-            'lang' => $request->get('_locale')
+            'lang' => $request->get('_locale'),
         ]);
     }
 }

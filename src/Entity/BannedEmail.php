@@ -19,30 +19,17 @@ class BannedEmail
      */
     private $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="ip", type="string", length=250, nullable=false)
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $email;
+    /** @ORM\Column(name="ip", type="string", length=250, nullable=false) */
+    private string $email;
 
-    /**
-     * @ORM\Column(name="last_try", type="integer", nullable=false)
-     */
+    /** @ORM\Column(name="last_try", type="integer", nullable=false) */
     private int $bannTime;
 
-    /**
-     * @return mixed
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param mixed $id
-     */
     public function setId($id): void
     {
         $this->id = $id;

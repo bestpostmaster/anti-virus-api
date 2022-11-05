@@ -158,20 +158,13 @@ class ActionRequested
         $this->hostedFileIds = $hostedFileIds;
     }
 
-    /**
-     * @return UserInterface
-     */
     public function getUser(): UserInterface
     {
         return $this->user;
     }
 
-    /**
-     * @param UserInterface $user
-     */
     public function setUser(UserInterface $user): void
     {
         $this->user = $user;
     }
-
 }

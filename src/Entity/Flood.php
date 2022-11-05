@@ -19,20 +19,11 @@ class Flood
      */
     private $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="ip", type="string", length=250, nullable=false)
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $ip = '';
+    /** @ORM\Column(name="ip", type="string", length=250, nullable=false) */
+    private string $ip = '';
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="last_try", type="integer", nullable=false)
-     */
-    private $lastTry = '0';
+    /** @ORM\Column(name="last_try", type="integer", nullable=false) */
+    private int $lastTry = 0;
 
     public function getIp(): string
     {
@@ -44,18 +35,12 @@ class Flood
         $this->ip = $ip;
     }
 
-    /**
-     * @return int
-     */
-    public function getLastTry()
+    public function getLastTry(): int
     {
         return $this->lastTry;
     }
 
-    /**
-     * @param int $lastTry
-     */
-    public function setLastTry($lastTry): void
+    public function setLastTry(int $lastTry): void
     {
         $this->lastTry = $lastTry;
     }

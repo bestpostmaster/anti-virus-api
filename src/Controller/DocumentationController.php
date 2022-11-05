@@ -23,7 +23,7 @@ class DocumentationController extends AbstractController
     public function index(Request $request): Response
     {
         return $this->render('app/documentation.html.twig', [
-            'lang' => $request->get('_locale')
+            'lang' => $request->get('_locale'),
         ]);
     }
 }

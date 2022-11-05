@@ -23,7 +23,7 @@ class AccountController extends AbstractController
     public function index(Request $request): Response
     {
         return $this->render('app/create-account.html.twig', [
-            'lang' => $request->get('_locale')
+            'lang' => $request->get('_locale'),
         ]);
     }
 
@@ -39,7 +39,7 @@ class AccountController extends AbstractController
     public function privateSpace(Request $request): Response
     {
         return $this->render('app/private-space.html.twig', [
-            'lang' => $request->get('_locale')
+            'lang' => $request->get('_locale'),
         ]);
     }
 }

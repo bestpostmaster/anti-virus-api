@@ -6,7 +6,6 @@ namespace App\Entity;
 
 use App\Repository\HostedFileRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -48,9 +47,10 @@ class HostedFile
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="files")
+     * @ORM\JoinColumn(nullable=false)
      * @groups("file:read")
      */
-    private UserInterface $user;
+    private User $user;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -70,7 +70,7 @@ class HostedFile
      * @ORM\Column(type="boolean")
      * @groups("file:read")
      */
-    private $scaned;
+    private bool $scaned;
 
     /**
      * @ORM\Column(type="boolean", options={"default" : false})
@@ -124,7 +124,7 @@ class HostedFile
     private ?string $filePassword;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="json", nullable=true)
      * @groups("file:read")
      */
     private array $authorizedUsers;
@@ -132,7 +132,7 @@ class HostedFile
     /** @groups("file:read") */
     private array $relatedActions = [];
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -149,12 +149,12 @@ class HostedFile
         return $this;
     }
 
-    public function getUser(): ?int
+    public function getUser(): int
     {
         return $this->user->getId();
     }
 
-    public function setUser(?UserInterface $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -289,17 +289,11 @@ class HostedFile
         $this->clientName = $clientName;
     }
 
-    /**
-     * @return ?\DateTimeInterface
-     */
     public function getExpirationDate(): ?\DateTimeInterface
     {
         return $this->expirationDate;
     }
 
-    /**
-     * @param ?\DateTimeInterface $expirationDate
-     */
     public function setExpirationDate(?\DateTimeInterface $expirationDate): void
     {
         $this->expirationDate = $expirationDate;

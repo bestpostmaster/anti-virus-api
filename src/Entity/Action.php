@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\ActionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -18,55 +17,40 @@ class Action
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
-     * @var string
-     *
      * @ORM\Column(type="string", length=250, nullable=false)
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      * @groups("file:read")
      */
-    private $actionName;
+    private string $actionName;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=250, nullable=false)
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $commandToRun;
+    /** @ORM\Column(type="string", length=250, nullable=false) */
+    private string $commandToRun;
+
+    /** @ORM\Column(type="string", length=250, nullable=false) */
+    private string $description;
+
+    /** @ORM\Column(type="string", length=250, nullable=false) */
+    private string $provider;
+
+    /** @ORM\Column(type="string", length=250, nullable=false) */
+    private string $type;
 
     /** @ORM\Column(type="boolean", nullable=false) */
     private $enabled;
 
-    /** @ORM\OneToMany(targetEntity=ActionRequested::class, mappedBy="action") */
-    private $actionsRequested;
+    /** @ORM\Column(type="boolean", nullable=false) */
+    private bool $hidden;
 
-    /**
-     * @return mixed
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
-    }
-
-    public function getActionName(): string
-    {
-        return $this->actionName;
-    }
-
-    public function setActionName(string $actionName): void
-    {
-        $this->actionName = $actionName;
     }
 
     public function getCommandToRun(): string
@@ -79,29 +63,58 @@ class Action
         $this->commandToRun = $commandToRun;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEnabled()
+    public function getEnabled(): bool
     {
         return $this->enabled;
     }
 
-    /**
-     * @param mixed $enabled
-     */
-    public function setEnabled($enabled): void
+    public function setEnabled(bool $enabled): void
     {
         $this->enabled = $enabled;
     }
 
-    public function getActionsRequested()
+    public function getDescription(): string
     {
-        return $this->actionsRequested;
+        return $this->description;
     }
 
-    public function setActionsRequested(ActionRequested $actionsRequested): void
+    public function setDescription(string $description): void
     {
-        $this->actionsRequested = $actionsRequested;
+        $this->description = $description;
+    }
+
+    public function getProvider(): string
+    {
+        return $this->provider;
+    }
+
+    public function setProvider(string $provider): void
+    {
+        $this->provider = $provider;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->hidden;
+    }
+
+    public function setHidden($hidden): void
+    {
+        $this->hidden = $hidden;
+    }
+
+    public function getActionName(): string
+    {
+        return $this->actionName;
     }
 }

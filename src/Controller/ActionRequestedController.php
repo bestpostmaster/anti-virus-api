@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repository\ActionRequestedRepository;
-use App\Repository\HostedFileRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -89,7 +87,7 @@ class ActionRequestedController extends AbstractController
 
         $found = false;
         $actionResultFiles = $action->getActionResults();
-        foreach($actionResultFiles as $result) {
+        foreach ($actionResultFiles as $result) {
             if ($result === $resultFileName) {
                 $found = $result;
             }
@@ -99,7 +97,7 @@ class ActionRequestedController extends AbstractController
             throw $this->createNotFoundException('The result does not exist');
         }
 
-        $directory = $this->actionsResultsDirectory.DIRECTORY_SEPARATOR.$action->getAction()->getActionName();
+        $directory = $this->actionsResultsDirectory.DIRECTORY_SEPARATOR.$action->getAction()->getActionName().DIRECTORY_SEPARATOR.$action->getId();
         $response = new BinaryFileResponse($directory.DIRECTORY_SEPARATOR.$found);
 
         $response->setContentDisposition(
