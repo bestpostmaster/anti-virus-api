@@ -120,7 +120,6 @@ $(function() {
 				actionsList += '<tr><td>'+action.action.actionName+'</td><td>'+action.accomplished+'</td><td>__ActionResults__</td></tr>';
 
 				if(action.accomplished && action.actionResults && Array.isArray(action.actionResults)) {
-					console.log('BOUCLE!!!');
 					let actionResults = '';
 					(action.actionResults).forEach(function(resultFile, index, array)
 					{
@@ -220,13 +219,13 @@ $(function() {
 				type:'GET',
 				url:url
 			}).done(function(blob){
-				console.log('BLOB Received : ', blob);
 				showFile(blob);
 			});
 
 		});
 
 		$('.btn-dropdown').click(function() {
+			console.log('btn-dropdown-click');
 			let target = $(this).attr('target');
 			if (!$('#'+target).is(':visible')) {
 				setTimeout(function(){
@@ -277,14 +276,13 @@ $(function() {
 				type:'GET',
 				url:url
 			}).done(function(blob){
-				console.log('BLOB Received : ', blob);
 				showFile(blob);
 			});
 
 		});
 
 		var appendElementsToList = function(elementsToAppend) {
-			console.log("Elements to append", elementsToAppend);
+
 			let trMiddle = '';
 			elementsToAppend.forEach(function(element, index, array)
 			{
@@ -317,6 +315,65 @@ $(function() {
 
 			if (trMiddle !== '') {
 				$("#files").append(trMiddle);
+
+				$('.btn-dropdown').click(function() {
+					console.log('btn-dropdown-click');
+					let target = $(this).attr('target');
+					if (!$('#'+target).is(':visible')) {
+						setTimeout(function(){
+							$('#'+target).fadeIn();
+						}, 500);
+						return;
+					}
+					setTimeout(function(){
+						$('#'+target).fadeOut();
+					}, 500);
+				});
+
+				$('.downloadResult').click(function() {
+					let fileName = $(this).attr('file_name');
+					let url = $(this).attr('link');
+
+					var showFile = function (blob) {
+
+						var data = '';
+
+						try {
+							var binaryData = [];
+							binaryData.push(blob);
+							data = window.URL.createObjectURL(new Blob(binaryData));
+						}  catch (error) {
+							console.error(error);
+							alert('This file can not be downloaded');
+							return;
+						}
+
+						var link = document.createElement('a');
+						link.href = data;
+						link.download = fileName;
+						link.click();
+						setTimeout(function () {
+							window.URL.revokeObjectURL(data);
+						}, 100)
+					}
+					var jwtToken = sessionStorage.getItem('token');
+					var headerObj = {"Authorization": "Bearer " + jwtToken}
+
+					var xhr = new XMLHttpRequest();
+					$.ajax({
+						xhrFields: {
+							responseType: 'blob'
+						},
+						headers: headerObj,
+						type:'GET',
+						url:url
+					}).done(function(blob){
+						showFile(blob);
+					});
+
+				});
+
+
 			}
 		}
 

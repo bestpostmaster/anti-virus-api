@@ -83,3 +83,7 @@ label.error {
 .actions-list {
   display: none;
 }
+
+.page_title {
+  font-size:2vw;
+}
