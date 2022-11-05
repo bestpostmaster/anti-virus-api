@@ -79,3 +79,7 @@ label.error {
   width: 95%;
   background-color: #dddddd;
 }
+
+.actions-list {
+  display: none;
+}

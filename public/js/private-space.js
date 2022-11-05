@@ -101,14 +101,38 @@ $(function() {
 
 		let tableMiddle = '';
 
-		var generateFileDetails = function(id, elementDescription, name, url, actionName, status, result) {
+		var generateFileDetails = function(id, elementDescription, name, url, actionName, status, result, relatedActionsList) {
 			let description = '<input type="button" value="'+elementDescription.slice(-25)+'" class="downloadLink" file_name="'+name+'" url="'+url+'" description="'+elementDescription+'">'
-			return '<tr id="file-details-'+id+'">\n' +
+			let rows = '<tr id="file-details-'+id+'">\n' +
 				'				<td id="file-description-'+id+'">'+description+'</td>\n' +
 				'				<td id="file-action-'+id+'">'+actionName+'</td>\n' +
 				'				<td id="file-action-status-'+id+'">'+status+'</td>\n' +
 				'				<td id="file-action-result-'+id+'">'+result+'</td>\n' +
-				'			</tr>\n';
+				'				<td id="drop-down-'+id+'"><button type="button" class="btn btn-secondary btn-sm dropdown-toggle btn-dropdown" target="actions-list-'+id+'"></td>\n' +
+				'			</tr>\n<tr id="actions-list-'+id+'" class="actions-list"><td colspan="5">__Actionslist__</td></tr>'
+				;
+
+			let actionsList = '<table><tr><td><b>Action name</b></td><td><b>Accomplished</b></td><td><b>Action results</b></td></tr>';
+
+			relatedActionsList.forEach(function(action, index, array)
+			{
+
+				actionsList += '<tr><td>'+action.action.actionName+'</td><td>'+action.accomplished+'</td><td>__ActionResults__</td></tr>';
+
+				if(action.accomplished && action.actionResults && Array.isArray(action.actionResults)) {
+					console.log('BOUCLE!!!');
+					let actionResults = '';
+					(action.actionResults).forEach(function(resultFile, index, array)
+					{
+						actionResults += '<a href="javascript:;" file_name="'+resultFile+'" link="/api/actions/download-action-result/'+action.id+'/'+resultFile+'" class="downloadResult">'+resultFile+'</a><br>';
+					});
+					actionsList = actionsList.replace('__ActionResults__', actionResults);
+				}
+			});
+
+			actionsList += '</table>';
+
+			return rows.replace('__Actionslist__', actionsList);
 		}
 
 		files.forEach(function(element, index, array)
@@ -116,23 +140,30 @@ $(function() {
 				lastOffset++;
 				let description = '<input type="button" value="'+(element.description).slice(-25)+'" class="downloadLink" file_name="'+element.name+'" url="'+element.url+'" description="'+element.description+'">'
 
-				if (element.relatedActions && element.relatedActions[0] && element.relatedActions[0].accomplished === false) {
-					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'In progress..', '');
+				let lastElement = null;
+				let relatedActionsList = null;
+				if (element.relatedActions && Array.isArray(element.relatedActions) && element.relatedActions.length >0) {
+					lastElement = (element.relatedActions)[element.relatedActions.length -1];
+					relatedActionsList = element.relatedActions;
+				}
+
+				if (lastElement && element.relatedActions[0].accomplished === false) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, lastElement.action.actionName, 'In progress..', '', relatedActionsList);
 					return;
 				}
 
-				if (element.relatedActions && element.relatedActions[0] && element.infected) {
-					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
+				if (lastElement && element.infected) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, lastElement.action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>', relatedActionsList);
 					return;
 				}
 
-				if (element.relatedActions && element.relatedActions[0] && !element.infected) {
-					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
+				if (lastElement && !element.infected) {
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, lastElement.action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>', relatedActionsList);
 					return;
 				}
 
 				if (element.relatedActions && !element.relatedActions[0]) {
-					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, '', '', '');
+					tableMiddle += generateFileDetails(element.id, element.description, element.name, element.url, '', '', '', relatedActionsList);
 					return;
 				}
 
@@ -150,6 +181,64 @@ $(function() {
 		let tableFoot = '    </table><br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" id="load-more">Load more..</a>';
 
 		$("#"+divId).html(tableHead+tableMiddle+tableFoot);
+
+		$('.downloadResult').click(function() {
+			let fileName = $(this).attr('file_name');
+			let url = $(this).attr('link');
+
+			var showFile = function (blob) {
+
+				var data = '';
+
+				try {
+					var binaryData = [];
+					binaryData.push(blob);
+					data = window.URL.createObjectURL(new Blob(binaryData));
+				}  catch (error) {
+					console.error(error);
+					alert('This file can not be downloaded');
+					return;
+				}
+
+				var link = document.createElement('a');
+				link.href = data;
+				link.download = fileName;
+				link.click();
+				setTimeout(function () {
+					window.URL.revokeObjectURL(data);
+				}, 100)
+			}
+			var jwtToken = sessionStorage.getItem('token');
+			var headerObj = {"Authorization": "Bearer " + jwtToken}
+
+			var xhr = new XMLHttpRequest();
+			$.ajax({
+				xhrFields: {
+					responseType: 'blob'
+				},
+				headers: headerObj,
+				type:'GET',
+				url:url
+			}).done(function(blob){
+				console.log('BLOB Received : ', blob);
+				showFile(blob);
+			});
+
+		});
+
+		$('.btn-dropdown').click(function() {
+			let target = $(this).attr('target');
+			if (!$('#'+target).is(':visible')) {
+				setTimeout(function(){
+					$('#'+target).fadeIn();
+				}, 500);
+				return;
+			}
+			setTimeout(function(){
+				$('#'+target).fadeOut();
+			}, 500);
+		});
+
 		$('.downloadLink').click(function() {
 			let fileName = $(this).attr('file_name');
 			let url = '/api/files/download/'+$(this).attr('url');
@@ -201,22 +290,29 @@ $(function() {
 			{
 				lastOffset++;
 
-				if (element.relatedActions && element.relatedActions[0] && element.relatedActions[0].accomplished === false) {
-					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'In progress..', '');
+				let lastElement = null;
+				let relatedActionsList = null;
+				if (element.relatedActions && Array.isArray(element.relatedActions) && element.relatedActions.length >0) {
+					lastElement = (element.relatedActions)[element.relatedActions.length -1];
+					relatedActionsList = element.relatedActions;
+				}
+
+				if (lastElement && element.relatedActions[0].accomplished === false) {
+					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, lastElement.action.actionName, 'In progress..', '', relatedActionsList);
 					return;
 				}
 
-				if (element.relatedActions && element.relatedActions[0] && element.infected) {
-					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>');
+				if (lastElement && element.infected) {
+					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, lastElement.action.actionName, 'Done', '<b style="color: darkred">!!>Infected!</b>', relatedActionsList);
 					return;
 				}
 
-				if (element.relatedActions && element.relatedActions[0] && !element.infected) {
-					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, element.relatedActions[0].action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>');
+				if (lastElement && !element.infected) {
+					trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, lastElement.action.actionName, 'Done', '<b style="color: #1e7e34">Is safe</b>', relatedActionsList);
 					return;
 				}
 
-				trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, '', '', '');
+				trMiddle += generateFileDetails(element.id, element.description, element.name, element.url, '', '', '', relatedActionsList);
 			});
 
 			if (trMiddle !== '') {
