@@ -16,8 +16,34 @@ $(function() {
 	var updateTableView = function (elements) {
 		elements.forEach(function(element, index, array)
 		{
+			let lastElement = null;
+			let relatedActionsList = null;
+			if (element.relatedActions && Array.isArray(element.relatedActions) && element.relatedActions.length >0) {
+				lastElement = (element.relatedActions)[element.relatedActions.length -1];
+				relatedActionsList = element.relatedActions;
+			}
+
+			relatedActionsList.forEach(function(action, index, array)
+			{
+				if(!action.accomplished) {
+					return;
+				}
+
+				$('#accomplished-'+action.id).html(action.accomplished);
+				$('#startDate-'+action.id).html(action.startTime);
+				$('#endDate-'+action.id).html(action.endTime);
+
+				let actionResults = '';
+				(action.actionResults).forEach(function(resultFile, index, array)
+				{
+					actionResults += '<a href="javascript:;" file_name="'+resultFile+'" link="/api/actions/download-action-result/'+action.id+'/'+resultFile+'" class="downloadResultRefreshed">'+resultFile+'</a><br>';
+				});
+
+				$('#actionResults-'+action.id).html(actionResults);
+			});
+
 			if ($("#file-details-"+element.id)) {
-				if (element.relatedActions && element.relatedActions[0] && element.relatedActions[0].accomplished === true) {
+				if (lastElement && lastElement.accomplished === true) {
 					$("#file-action-status-"+element.id).html('Done');
 					if (element.infected) {
 						$("#file-action-result-"+element.id).html('<b style="color: darkred">!!>Infected!</b>');
@@ -30,6 +56,49 @@ $(function() {
 				$("#file-action-status-"+element.id).html('In progress..')
 				$("#file-action-result-"+element.id).html('');
 			}
+		});
+
+		$('.downloadResultRefreshed').click(function() {
+			let fileName = $(this).attr('file_name');
+			let url = $(this).attr('link');
+
+			var showFile = function (blob) {
+
+				var data = '';
+
+				try {
+					var binaryData = [];
+					binaryData.push(blob);
+					data = window.URL.createObjectURL(new Blob(binaryData));
+				}  catch (error) {
+					console.error(error);
+					alert('This file can not be downloaded');
+					return;
+				}
+
+				var link = document.createElement('a');
+				link.href = data;
+				link.download = fileName;
+				link.click();
+				setTimeout(function () {
+					window.URL.revokeObjectURL(data);
+				}, 100)
+			}
+			var jwtToken = sessionStorage.getItem('token');
+			var headerObj = {"Authorization": "Bearer " + jwtToken}
+
+			var xhr = new XMLHttpRequest();
+			$.ajax({
+				xhrFields: {
+					responseType: 'blob'
+				},
+				headers: headerObj,
+				type:'GET',
+				url:url
+			}).done(function(blob){
+				showFile(blob);
+			});
+
 		});
 	}
 
@@ -121,7 +190,7 @@ $(function() {
 			relatedActionsList.forEach(function(action, index, array)
 			{
 
-				actionsList += '<tr><td>'+action.action.actionName+'</td><td>'+action.accomplished+'</td><td>'+action.startTime+'</td><td>'+action.endTime+'</td><td>__ActionResults__</td></tr>';
+				actionsList += '<tr><td>'+action.action.actionName+'</td><td id="accomplished-'+action.id+'">'+action.accomplished+'</td><td id="startDate-'+action.id+'">'+action.startTime+'</td><td id="endDate-'+action.id+'">'+action.endTime+'</td><td id="actionResults-'+action.id+'">__ActionResults__</td></tr>';
 
 				if(action.accomplished && action.actionResults && Array.isArray(action.actionResults)) {
 					let actionResults = '';
@@ -241,7 +310,6 @@ $(function() {
 		});
 
 		$('.btn-dropdown').click(function() {
-			console.log('btn-dropdown-click');
 			let target = $(this).attr('target');
 			if (!$('#'+target).is(':visible')) {
 				setTimeout(function(){
@@ -364,7 +432,6 @@ $(function() {
 				$("#files").append(trMiddle);
 
 				$('.btn-dropdown').click(function() {
-					console.log('btn-dropdown-click');
 					let target = $(this).attr('target');
 					if (!$('#'+target).is(':visible')) {
 						setTimeout(function(){
