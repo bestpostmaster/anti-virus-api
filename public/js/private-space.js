@@ -112,12 +112,16 @@ $(function() {
 				'			</tr>\n<tr id="actions-list-'+id+'" class="actions-list"><td colspan="5">__Actionslist__</td></tr>'
 				;
 
-			let actionsList = '<table><tr><td><b>Action name</b></td><td><b>Accomplished</b></td><td><b>Action results</b></td></tr>';
+			let actionsList = '<table class="details_table"><tr><td><b>Action name</b></td><td><b>Accomplished</b></td><td><b>Start date</b></td><td><b>End date</b></td><td><b>Action results</b></td></tr>';
+
+			if (!relatedActionsList) {
+				relatedActionsList = [];
+			}
 
 			relatedActionsList.forEach(function(action, index, array)
 			{
 
-				actionsList += '<tr><td>'+action.action.actionName+'</td><td>'+action.accomplished+'</td><td>__ActionResults__</td></tr>';
+				actionsList += '<tr><td>'+action.action.actionName+'</td><td>'+action.accomplished+'</td><td>'+action.startTime+'</td><td>'+action.endTime+'</td><td>__ActionResults__</td></tr>';
 
 				if(action.accomplished && action.actionResults && Array.isArray(action.actionResults)) {
 					let actionResults = '';
@@ -127,9 +131,21 @@ $(function() {
 					});
 					actionsList = actionsList.replace('__ActionResults__', actionResults);
 				}
+
+				if (actionsList.includes("__ActionResults__")) {
+					actionsList = actionsList.replace('__ActionResults__', 'In progress..');
+				}
+
 			});
 
-			actionsList += '</table>';
+			let buttonsList = '<tr style="background-color: #FFFFFF;"><td colspan="5" class="btn_list">'+
+				/*'<button type="button" class="btn btn-info">Edit</button>\n '+
+				'<button type="button" class="btn btn-info">Share</button>\n '+
+				'<button type="button" class="btn btn-info">New action</button>\n '+
+				'<button type="button" class="btn btn-info">Light</button>\n '+ */
+				'<button type="button" class="btn btn-danger btn_delete" id="btn_delete_'+id+'" file_id="'+id+'">Delete file</button></td></tr>';
+
+			actionsList = actionsList + buttonsList+'</table>';
 
 			return rows.replace('__Actionslist__', actionsList);
 		}
@@ -236,6 +252,37 @@ $(function() {
 			setTimeout(function(){
 				$('#'+target).fadeOut();
 			}, 500);
+		});
+
+		$('.btn_delete').click(function() {
+			let fileId = $(this).attr('file_id');
+			let url = '/api/files/delete/'+fileId;
+			$.ajax({
+				type: "DELETE",
+				headers: {
+					Authorization: 'Bearer '+sessionStorage.getItem('token')
+				},
+				url: url,
+				contentType: false,
+				dataType: "json",
+				enctype: 'multipart/form-data',
+				data: {},
+				processData:false,
+
+				beforeSend: function() {
+				},
+				success: function(json) {
+					setTimeout(function(){
+						$('#actions-list-'+json.fileId).fadeOut();
+					}, 500);
+					setTimeout(function(){
+						$('#file-details-'+json.fileId).fadeOut();
+					}, 500);
+				},
+				error: function(request, status, error) {
+					alert('ERROR');
+				}
+			});
 		});
 
 		$('.downloadLink').click(function() {

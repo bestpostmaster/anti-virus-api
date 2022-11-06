@@ -87,3 +87,12 @@ label.error {
 .page_title {
   font-size:2vw;
 }
+
+.details_table {
+  background-color: #cbe7eb;
+  width:95%;
+}
+
+.btn_list {
+  text-align: right;
+}

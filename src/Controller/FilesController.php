@@ -10,6 +10,7 @@ use App\Entity\HostedFile;
 use App\Entity\User;
 use App\Message\CommandRunnerMessage;
 use App\Repository\ActionRepository;
+use App\Repository\ActionRequestedRepository;
 use App\Repository\HostedFileRepository;
 use App\Service\FileConverterService;
 use App\Service\VirusScannerService;
@@ -29,11 +30,13 @@ class FilesController extends AbstractController
     protected const MAX_LIMIT = 200;
     protected const DEFAULT_OFFSET = 0;
     private string $hostingDirectory;
+    private string $actionsResultsDirectory;
     private ManagerRegistry $doctrine;
 
-    public function __construct(string $hostingDirectory, ManagerRegistry $doctrine)
+    public function __construct(string $hostingDirectory, ManagerRegistry $doctrine, string $actionsResultsDirectory)
     {
         $this->hostingDirectory = $hostingDirectory;
+        $this->actionsResultsDirectory = $actionsResultsDirectory;
         $this->doctrine = $doctrine;
     }
 
@@ -374,7 +377,7 @@ class FilesController extends AbstractController
     /**
      * @Route("/api/files/delete/{fileId}", name="app_files_delete", methods={"DELETE"})
      */
-    public function deleteById(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine, ActionRepository $actionRepository): Response
+    public function deleteById(Request $request, HostedFileRepository $hostedFileRepository, ManagerRegistry $doctrine, ActionRepository $actionRepository, ActionRequestedRepository $actionRequestedRepository): Response
     {
         $userId = $this->getUser()->getId();
         $id = $request->get('fileId');
@@ -384,29 +387,31 @@ class FilesController extends AbstractController
         }
 
         if ($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-            $result = $hostedFileRepository->findOneBy(['id' => $id]);
+            $file = $hostedFileRepository->findOneBy(['id' => $id]);
         } else {
-            $result = $hostedFileRepository->findOneBy(['id' => $id, 'user' => $userId]);
+            $file = $hostedFileRepository->findOneBy(['id' => $id, 'user' => $userId]);
         }
 
-        if (!$result) {
+        if (!$file) {
             throw $this->createNotFoundException('The file does not exist');
         }
 
+        $this->deleteRelatedActions($file, $actionRequestedRepository);
+
         $manager = $doctrine->getManager();
         $currentUser = $manager->find(User::class, $this->getUser());
-        $manager->remove($result);
+        $manager->remove($file);
         $manager->flush();
 
-        $fullPath = $this->hostingDirectory.$result->getName();
+        $fullPath = $this->hostingDirectory.$file->getName();
 
         if (file_exists($fullPath)) {
-            unlink($this->hostingDirectory.$result->getName());
+            unlink($this->hostingDirectory.$file->getName());
         }
 
-        $this->decreaseUserSpace($currentUser, $result->getSize());
+        $this->decreaseUserSpace($currentUser, $file->getSize());
 
-        return $this->json([], 200);
+        return $this->json(['fileId' => $id], 200);
     }
 
     /**
@@ -536,5 +541,45 @@ class FilesController extends AbstractController
         }
 
         return $hostedFiles;
+    }
+
+    private function deleteRelatedActions(HostedFile $file, ActionRequestedRepository $actionRepository)
+    {
+        $relatedActions = $actionRepository->findRelatedActions($file->getId());
+        if (empty($relatedActions)) {
+            return;
+        }
+
+        $actionRepository->deleteRelatedActions($file->getId());
+
+        foreach ($relatedActions as $actionRequested) {
+            $actionResultsDir = $this->actionsResultsDirectory.DIRECTORY_SEPARATOR.$actionRequested->getAction()->getActionName();
+            if (is_dir($this->actionsResultsDirectory) && is_dir($actionResultsDir) && is_dir($actionResultsDir.DIRECTORY_SEPARATOR.$actionRequested->getId())) {
+                $this->deleteDirectory($actionResultsDir.DIRECTORY_SEPARATOR.$actionRequested->getId());
+            }
+        }
+    }
+
+    private function deleteDirectory(string $dir): bool
+    {
+        if (!file_exists($dir)) {
+            return true;
+        }
+
+        if (!is_dir($dir)) {
+            return unlink($dir);
+        }
+
+        foreach (scandir($dir) as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            if (!$this->deleteDirectory($dir.DIRECTORY_SEPARATOR.$item)) {
+                return false;
+            }
+        }
+
+        return rmdir($dir);
     }
 }

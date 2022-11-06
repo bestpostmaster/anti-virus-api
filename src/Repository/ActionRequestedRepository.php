@@ -60,4 +60,16 @@ class ActionRequestedRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()
             ->getResult();
     }
+
+    public function deleteRelatedActions(int $fileId)
+    {
+        $queryBuilder = $this->createQueryBuilder('f');
+        $queryBuilder->delete()
+            ->andWhere('f.hostedFileIds LIKE :expression')
+            ->setParameter('expression', '%'.'"fileId":'.$fileId.'%')
+        ;
+
+        return $queryBuilder->getQuery()
+            ->getResult();
+    }
 }
