@@ -44,4 +44,20 @@ class HomeController extends AbstractController
             'lang' => $request->get('_locale'),
         ]);
     }
+
+    /**
+     * @Route(
+     *     "/{_locale}/user/settings",
+     *     name="user_setings",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *     }
+     * )
+     */
+    public function settings(Request $request): Response
+    {
+        return $this->render('app/settings.html.twig', [
+            'lang' => $request->get('_locale'),
+        ]);
+    }
 }

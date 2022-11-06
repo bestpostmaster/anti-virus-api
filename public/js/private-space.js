@@ -129,7 +129,7 @@ $(function() {
 		}, 5000);
 	}
 
-	var getFilesList = function(limit = 10, offset = 0) {
+	var getFilesList = function(limit = 50, offset = 0) {
 		let dataReceived = null;
 		$.ajax({
 			type: "POST",
@@ -492,7 +492,7 @@ $(function() {
 		}
 
 		$('#load-more').click(function() {
-			var elementsToAppend = getFilesList(10, lastOffset);
+			var elementsToAppend = getFilesList(50, lastOffset);
 			if(elementsToAppend.length > 0) {
 				appendElementsToList(elementsToAppend);
 			}

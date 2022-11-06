@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+    {%  include 'app/common-head-tags.html.twig' %}
+
+    <title>Settings, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
+    <meta name="description" content="Signup, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
+</head>
+<body>
+
+
+<div class="content">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+
+                <div class="row align-items-center">
+                    <div class="col-lg-7 mb-5 mb-lg-0">
+
+                        <h3 class="mb-4">Settings</h3>
+
+                        <form class="border-right pr-5 mb-5" method="post" id="settingsForm" name="subscribeForm">
+                            <div class="row">
+                                <div class="col-md-12 form-group">
+                                    <input type="text" class="form-control" name="email" id="email" placeholder="Email">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 form-group">
+                                    <input type="password" class="form-control" name="password1" id="password1" placeholder="Password">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 form-group">
+                                    <input type="password" class="form-control" name="password2" id="password2" placeholder="Repeat password">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <input type="submit" value="Save" class="btn btn-primary rounded-0 py-2 px-4">
+                                    <span class="submitting"></span>
+                                </div>
+                            </div>
+
+                        </form>
+
+                        <div id="form-message-warning"></div>
+                        <div id="form-message-success">
+                            <div class="row">
+                                <div class="col-md-12 form-group">
+                                    <label for="avatar">To complete the registration, please click on the link that you received in your mailbox</label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-4 ml-auto">
+                        <p><a href="/{{ lang }}/">I already have an account</a></p>
+                        <h3 class="mb-4">API for developers [JSON / REST API]</h3>
+                        <p>Start scanning user uploaded content and files within minutes. Our JSON API is easy to integrate and quickly lets you scan without overloading your servers.</p>
+                        <p><a href="/{{ lang }}/documentation">Read more</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{%  include 'app/common-js-sources.html.twig' %}
+
+<script src="/js/settings.js"></script>
+</body>
+</html>
+
