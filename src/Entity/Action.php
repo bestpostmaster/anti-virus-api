@@ -117,4 +117,9 @@ class Action
     {
         return $this->actionName;
     }
+
+    public function setActionName(string $actionName): void
+    {
+        $this->actionName = $actionName;
+    }
 }

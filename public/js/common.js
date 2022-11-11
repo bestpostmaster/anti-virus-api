@@ -19,7 +19,7 @@ function initRefreshTokenCalls() {
             },
             error: function(request, status, error) {
                 alert('Your are disconnected!');
-                sessionStorage.setItem('refreshToken', response.refresh_token);
+                sessionStorage.clear();
                 document.location.href="/";
             }
         });

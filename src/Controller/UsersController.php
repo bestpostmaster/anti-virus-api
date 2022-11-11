@@ -57,6 +57,29 @@ class UsersController extends AbstractController
     }
 
     /**
+     * @Route("/api/user/user/{userId}", name="get_my_infos")
+     */
+    public function getMyInfos(Request $request, UserRepository $userRepository): Response
+    {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            throw new \Exception('Not authorized !');
+        }
+
+        $currentUser = $this->getUser();
+
+        if (!$currentUser || $currentUser->getId() !== (int) $request->get('userId')) {
+            throw new \Exception('Not authorized !');
+        }
+
+        $result = $userRepository->findOneBy(['id' => $request->get('userId')]);
+        if (!$result) {
+            throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
+        }
+
+        return $this->json($result, 200, [], ['groups' => 'user:read']);
+    }
+
+    /**
      * @Route("/api/admin/edit-user/{userId}", name="edit_user")
      *
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
@@ -68,6 +91,37 @@ class UsersController extends AbstractController
         }
 
         $user = $userRepository->findOneBy(['id' => $request->get('userId')]);
+        if (!$user) {
+            throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
+        }
+
+        $user = $this->hydrateUserByAdmin($request, $user);
+        $em = $doctrine->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        return $this->json($user, 200, [], ['groups' => 'user:read']);
+    }
+
+    /**
+     * @Route("/api/user/edit-user/{userId}", name="edit_my_infos")
+     *
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     */
+    public function editMyInfos(Request $request, UserRepository $userRepository, ManagerRegistry $doctrine): Response
+    {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            throw new \Exception('Not authorized !');
+        }
+
+        $currentUser = $this->getUser();
+
+        if (!$currentUser || $currentUser->getId() !== (int) $request->get('userId')) {
+            throw new \Exception('Not authorized !');
+        }
+
+        $user = $userRepository->findOneBy(['id' => $request->get('userId')]);
+
         if (!$user) {
             throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
         }
@@ -114,7 +168,7 @@ class UsersController extends AbstractController
     public function add(Request $request, ManagerRegistry $doctrine): Response
     {
         if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-            throw new \Exception('Admin only !');
+            return new Response('Admin only !', 401);
         }
 
         $data = json_decode($request->getContent());
@@ -176,7 +230,7 @@ class UsersController extends AbstractController
         $manager->persist($user);
         $manager->flush($user);
 
-        $link = $this->webSiteHomeUrl.'/api/users/confirm-email-address/'.$user->getSecretTokenForValidation();
+        $link = $this->webSiteHomeUrl.'/'.$request->get('_locale').'/users/confirm-email-address/'.$user->getSecretTokenForValidation();
 
         $email = (new TemplatedEmail())
             ->from($this->webSiteEmailAddress)
@@ -214,7 +268,7 @@ class UsersController extends AbstractController
     /**
      * @return void
      */
-    public function hydrateUser(Request $request, User $user): User
+    public function hydrateUserByAdmin(Request $request, User $user): User
     {
         $data = json_decode($request->getContent(), true);
         empty($data['email']) ? true : $user->setEmail($data['email']);
@@ -238,6 +292,49 @@ class UsersController extends AbstractController
         empty($data['avatarPicture']) ? true : $user->setAvatarPicture($data['avatarPicture']);
         empty($data['dateOfBirth']) ? true : $user->setDateOfBirth($data['dateOfBirth']);
         empty($data['isBanned']) ? true : $user->setIsBanned($data['isBanned']);
+
+        return $user;
+    }
+
+    /**
+     * @return void
+     */
+    public function hydrateUser(Request $request, User $user): User
+    {
+        $data = json_decode($request->getContent(), true);
+
+        empty($data['password']) ? true : $user->setPassword($this->passwordEncoder->hashPassword(
+            $user,
+            $data['password']
+        ));
+
+        empty($data['phoneNumber']) ? true : $user->setPhoneNumber($data['phoneNumber']);
+        empty($data['city']) ? true : $user->setCity($data['city']);
+        empty($data['country']) ? true : $user->setCountry($data['country']);
+        empty($data['zipCode']) ? true : $user->setZipCode($data['zipCode']);
+        empty($data['preferredLanguage']) ? true : $user->setPreferredLanguage($data['preferredLanguage']);
+        empty($data['avatarPicture']) ? true : $user->setAvatarPicture($data['avatarPicture']);
+        empty($data['dateOfBirth']) ? true : $user->setDateOfBirth($data['dateOfBirth']);
+
+        if (isset($data['sendEmailAfterEachAction']) && is_bool($data['sendEmailAfterEachAction'])) {
+            $user->setSendEmailAfterEachAction($data['sendEmailAfterEachAction']);
+        }
+
+        if (isset($data['sendEmailIfFileIsInfected']) && is_bool($data['sendEmailIfFileIsInfected'])) {
+            $user->setSendEmailIfFileIsInfected($data['sendEmailIfFileIsInfected']);
+        }
+
+        if (isset($data['postUrlAfterAction']) && trim($data['postUrlAfterAction']) !== '') {
+            $user->setPostUrlAfterAction(strtolower($data['postUrlAfterAction']));
+        }
+
+        if (isset($data['sendPostToUrlAfterEachAction']) && is_bool($data['sendPostToUrlAfterEachAction'])) {
+            $user->setSendPostToUrlAfterEachAction($data['sendPostToUrlAfterEachAction']);
+        }
+
+        if (isset($data['sendPostToUrlIfFileIsInfected']) && is_bool($data['sendPostToUrlIfFileIsInfected'])) {
+            $user->setSendPostToUrlIfFileIsInfected($data['sendPostToUrlIfFileIsInfected']);
+        }
 
         return $user;
     }

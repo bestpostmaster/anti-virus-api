@@ -22,6 +22,11 @@ class AuthenticationSuccessListener
             $event->stopPropagation();
             $event->setData(['error' => '0024', 'message' => 'You have not confirmed your email address. Please click on the link you received by email. Also check the spam folder']);
         }
+
+        $event->setData([
+            'token' => $event->getData()['token'],
+            'userId' => $event->getUser()->getId(),
+        ]);
     }
 
     private function getIp(): ?string

@@ -69,6 +69,6 @@ class UsersControllerTest extends WebTestCase
             ],
         ]);
 
-        self::assertResponseStatusCodeSame(403);
+        self::assertResponseStatusCodeSame(401);
     }
 }

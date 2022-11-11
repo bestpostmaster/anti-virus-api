@@ -17,6 +17,10 @@ class ActionFixtures extends Fixture
                 'actionName' => 'Scan',
                 'commandToRun' => 'clamscan',
                 'enabled' => true,
+                'description' => 'Run virus scan, maximum file size 100 MB',
+                'provider' => 'commandToRun',
+                'type' => 'commandToRun',
+                'hidden' => false,
             ],
         ];
 
@@ -25,6 +29,10 @@ class ActionFixtures extends Fixture
             $action->setActionName($item['actionName']);
             $action->setCommandToRun($item['commandToRun']);
             $action->setEnabled($item['enabled']);
+            $action->setDescription($item['description']);
+            $action->setProvider($item['provider']);
+            $action->setType($item['provider']);
+            $action->setHidden($item['hidden']);
 
             $manager->persist($action);
             $manager->flush($action);

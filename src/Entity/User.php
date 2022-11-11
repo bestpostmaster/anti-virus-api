@@ -105,22 +105,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /** @ORM\Column(type="boolean", nullable=true) */
     private $isBanned = false;
 
-    /** @ORM\Column(type="boolean", nullable=false) */
+    /** @ORM\Column(type="boolean", nullable=false)
+     * @groups("user:read", "file:read")
+     */
     private bool $sendEmailAfterEachAction = false;
 
-    /** @ORM\Column(type="boolean", nullable=false) */
+    /** @ORM\Column(type="boolean", nullable=false)
+     * @groups("user:read", "file:read")
+     */
     private bool $sendEmailIfFileIsInfected = false;
 
-    /** @ORM\Column(type="boolean", nullable=false) */
+    /** @ORM\Column(type="boolean", nullable=false)
+     * @groups("user:read", "file:read")
+     */
     private bool $sendSmsIfFileIsInfected = false;
 
-    /** @ORM\Column(type="string", nullable=true) */
+    /** @ORM\Column(type="string", nullable=true)
+     * @groups("user:read", "file:read")
+     */
     private string $postUrlAfterAction;
 
-    /** @ORM\Column(type="boolean", nullable=true) */
+    /** @ORM\Column(type="boolean", nullable=true)
+     * @groups("user:read", "file:read")
+     */
     private bool $sendPostToUrlAfterEachAction = false;
 
-    /** @ORM\Column(type="boolean", nullable=true) */
+    /** @ORM\Column(type="boolean", nullable=true)
+     * @groups("user:read", "file:read")
+     */
     private bool $sendPostToUrlIfFileIsInfected = false;
 
     /** @ORM\Column(type="boolean", nullable=true, options={"default" : false}) */

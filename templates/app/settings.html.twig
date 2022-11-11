@@ -20,31 +20,7 @@
                         <h3 class="mb-4">Settings</h3>
 
                         <form class="border-right pr-5 mb-5" method="post" id="settingsForm" name="subscribeForm">
-                            <div class="row">
-                                <div class="col-md-12 form-group">
-                                    <input type="text" class="form-control" name="email" id="email" placeholder="Email">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12 form-group">
-                                    <input type="password" class="form-control" name="password1" id="password1" placeholder="Password">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12 form-group">
-                                    <input type="password" class="form-control" name="password2" id="password2" placeholder="Repeat password">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <input type="submit" value="Save" class="btn btn-primary rounded-0 py-2 px-4">
-                                    <span class="submitting"></span>
-                                </div>
-                            </div>
-
+                                <img src="/images/loading.gif" />
                         </form>
 
                         <div id="form-message-warning"></div>
@@ -58,7 +34,7 @@
 
                     </div>
                     <div class="col-lg-4 ml-auto">
-                        <p><a href="/{{ lang }}/">I already have an account</a></p>
+                        <p><a href="/{{ lang }}/private-space" id="btn-documentation" value="API Documentation" class="btn btn-info rounded-0 py-2 px-4">Home</a><input type="button" id="btn-log-out" value="Log out" class="btn btn-primary rounded-0 py-2 px-4"></p>
                         <h3 class="mb-4">API for developers [JSON / REST API]</h3>
                         <p>Start scanning user uploaded content and files within minutes. Our JSON API is easy to integrate and quickly lets you scan without overloading your servers.</p>
                         <p><a href="/{{ lang }}/documentation">Read more</a></p>

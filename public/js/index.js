@@ -60,9 +60,10 @@ $(function() {
 				      	$submit.css('display', 'block').text(waitText);
 				      },
 				      success: function(response) {
-		               if (response && response.token && response.refresh_token) {
+		               if (response && response.token && response.refresh_token && response.userId) {
 						   sessionStorage.setItem('token', response.token);
 						   sessionStorage.setItem('refreshToken', response.refresh_token);
+						   sessionStorage.setItem('userId', response.userId);
 						   initRefreshTokenCalls();
 						   window.location.href = "/"+LANG+"/private-space";
 					  } else if (response.error && response.message){
