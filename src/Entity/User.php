@@ -105,6 +105,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /** @ORM\Column(type="boolean", nullable=true) */
     private $isBanned = false;
 
+    /** @ORM\Column(type="boolean", nullable=false) */
+    private bool $sendEmailAfterEachAction = false;
+
+    /** @ORM\Column(type="boolean", nullable=false) */
+    private bool $sendEmailIfFileIsInfected = false;
+
+    /** @ORM\Column(type="boolean", nullable=false) */
+    private bool $sendSmsIfFileIsInfected = false;
+
+    /** @ORM\Column(type="string", nullable=true) */
+    private string $postUrlAfterAction;
+
+    /** @ORM\Column(type="boolean", nullable=true) */
+    private bool $sendPostToUrlAfterEachAction = false;
+
+    /** @ORM\Column(type="boolean", nullable=true) */
+    private bool $sendPostToUrlIfFileIsInfected = false;
+
     /** @ORM\Column(type="boolean", nullable=true, options={"default" : false}) */
     private bool $emailConfirmed = false;
 
@@ -427,5 +445,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setActionsRequested($actionsRequested): void
     {
         $this->actionsRequested = $actionsRequested;
+    }
+
+    public function isSendEmailAfterEachAction(): bool
+    {
+        return $this->sendEmailAfterEachAction;
+    }
+
+    public function setSendEmailAfterEachAction(bool $sendEmailAfterEachAction): void
+    {
+        $this->sendEmailAfterEachAction = $sendEmailAfterEachAction;
+    }
+
+    public function isSendEmailIfFileIsInfected(): bool
+    {
+        return $this->sendEmailIfFileIsInfected;
+    }
+
+    public function setSendEmailIfFileIsInfected(bool $sendEmailIfFileIsInfected): void
+    {
+        $this->sendEmailIfFileIsInfected = $sendEmailIfFileIsInfected;
+    }
+
+    public function isSendSmsIfFileIsInfected(): bool
+    {
+        return $this->sendSmsIfFileIsInfected;
+    }
+
+    public function setSendSmsIfFileIsInfected(bool $sendSmsIfFileIsInfected): void
+    {
+        $this->sendSmsIfFileIsInfected = $sendSmsIfFileIsInfected;
+    }
+
+    public function getPostUrlAfterAction(): string
+    {
+        return $this->postUrlAfterAction;
+    }
+
+    public function setPostUrlAfterAction(string $postUrlAfterAction): void
+    {
+        $this->postUrlAfterAction = $postUrlAfterAction;
+    }
+
+    public function isSendPostToUrlAfterEachAction(): bool
+    {
+        return $this->sendPostToUrlAfterEachAction;
+    }
+
+    public function setSendPostToUrlAfterEachAction(bool $sendPostToUrlAfterEachAction): void
+    {
+        $this->sendPostToUrlAfterEachAction = $sendPostToUrlAfterEachAction;
+    }
+
+    public function isSendPostToUrlIfFileIsInfected(): bool
+    {
+        return $this->sendPostToUrlIfFileIsInfected;
+    }
+
+    public function setSendPostToUrlIfFileIsInfected(bool $sendPostToUrlIfFileIsInfected): void
+    {
+        $this->sendPostToUrlIfFileIsInfected = $sendPostToUrlIfFileIsInfected;
     }
 }
