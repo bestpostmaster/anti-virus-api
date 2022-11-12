@@ -7,6 +7,8 @@ namespace App\Service;
 use App\Entity\ActionRequested;
 use App\Repository\HostedFileRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
 
 class VirusScannerService
 {
@@ -16,8 +18,13 @@ class VirusScannerService
     private string $projectDirectory;
     private string $kernelEnvironment;
     private HostedFileRepository $hostedFileRepository;
+    private MailerInterface $mailer;
+    private string $webSiteEmailAddress;
 
-    public function __construct(ManagerRegistry $doctrine, string $hostingDirectory, string $actionsResultsDirectory, string $projectDirectory, string $kernelEnvironment, HostedFileRepository $hostedFileRepository)
+    public function __construct(ManagerRegistry $doctrine, string $hostingDirectory,
+                                string $actionsResultsDirectory, string $projectDirectory,
+                                string $kernelEnvironment, HostedFileRepository $hostedFileRepository,
+                                MailerInterface $mailer, string $webSiteEmailAddress)
     {
         $this->doctrine = $doctrine;
         $this->hostingDirectory = $hostingDirectory;
@@ -25,6 +32,8 @@ class VirusScannerService
         $this->projectDirectory = $projectDirectory;
         $this->kernelEnvironment = $kernelEnvironment;
         $this->hostedFileRepository = $hostedFileRepository;
+        $this->mailer = $mailer;
+        $this->webSiteEmailAddress = $webSiteEmailAddress;
     }
 
     public function runCommand(ActionRequested $actionRequested): void
@@ -89,8 +98,10 @@ class VirusScannerService
             ['', '/actionsResultsDirectory/', '/', $hostedFile->getClientName()], $scanResult);
         $scanResult = '[REF : '.$hostedFile->getName()." ] \n".$scanResult;
 
+        $isInfected = false;
         if (str_contains($scanResult, 'Infected files: 1')) {
             $hostedFile->setInfected(true);
+            $isInfected = true;
         }
 
         $hostedFile->setScanResult($scanResult);
@@ -98,6 +109,32 @@ class VirusScannerService
         $em = $this->doctrine->getManager();
         $em->persist($hostedFile);
         $em->flush();
+
+        $this->notifyUser($scanResult, $isInfected, $actionRequested->getUser(), $hostedFile);
+    }
+
+    private function notifyUser($scanResult, $isInfected, $user, $hostedFile): void
+    {
+        $subject = $isInfected === true ? 'Your file is infected' : 'Your file is safe';
+        if ($user->isSendEmailAfterEachAction()) {
+            $email = (new TemplatedEmail())
+                ->from($this->webSiteEmailAddress)
+                ->to($user->getEmail())
+                // ->cc('cc@example.com')
+                // ->bcc('bcc@example.com')
+                // ->replyTo('fabien@example.com')
+                // ->priority(Email::PRIORITY_HIGH)
+                ->subject($subject)
+                ->htmlTemplate('app/mails/scan-result.html.twig')
+                ->context([
+                    'scanResult' => $scanResult,
+                    'fileDescription' => $hostedFile->getDescription(),
+                    'lang' => 'en',
+                    'isInfected' => $isInfected
+                ]);
+
+            $this->mailer->send($email);
+        }
     }
 
     public function simulateScan(string $logPath): void

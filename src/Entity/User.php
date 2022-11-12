@@ -518,4 +518,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->sendPostToUrlIfFileIsInfected = $sendPostToUrlIfFileIsInfected;
     }
+
 }

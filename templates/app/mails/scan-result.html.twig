@@ -1,0 +1,21 @@
+{% include 'app/mails/header.html.twig' %}
+
+<p>Hello,<br>
+    Here is the result of the virus scan<br><br>
+
+    <br>File : <b>{{ fileDescription }}</b><br>
+
+    {% if isInfected %}
+        <b style="color:#990000;">Warning! a virus has been detected</b>
+    {% else %}
+        <b style="color:#009900;">This file is safe and does not contain any virus</b>
+    {% endif %}
+
+    <br><br>
+
+    {{ scanResult }}
+
+    <br><br>
+
+{% include 'app/mails/footer.html.twig' %}
+
