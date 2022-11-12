@@ -63,6 +63,16 @@ class ActionRequested
      */
     private bool $accomplished = false;
 
+    /** @ORM\Column(type="string", length=45, nullable=false)
+     * @groups("file:read")
+     */
+    private string $userIsNotifiedByEmail = 'off'; // Possibles values 'ok', 'ko', 'off'
+
+    /** @ORM\Column(type="string", length=45, nullable=false)
+     * @groups("file:read")
+     */
+    private string $userIsNotifiedByPostQuery = 'off'; // Possibles values 'ok', 'ko', 'off'
+
     /** @ORM\Column(type="json", nullable=false)
      * @groups("file:read")
      */
@@ -166,5 +176,25 @@ class ActionRequested
     public function setUser(UserInterface $user): void
     {
         $this->user = $user;
+    }
+
+    public function isUserIsNotifiedByEmail(): string
+    {
+        return $this->userIsNotifiedByEmail;
+    }
+
+    public function setUserIsNotifiedByEmail(string $userIsNotifiedByEmail): void
+    {
+        $this->userIsNotifiedByEmail = $userIsNotifiedByEmail;
+    }
+
+    public function isUserIsNotifiedByPostQuery(): string
+    {
+        return $this->userIsNotifiedByPostQuery;
+    }
+
+    public function setUserIsNotifiedByPostQuery(string $userIsNotifiedByPostQuery): void
+    {
+        $this->userIsNotifiedByPostQuery = $userIsNotifiedByPostQuery;
     }
 }

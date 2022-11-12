@@ -7,7 +7,9 @@ namespace App\Service;
 use App\Entity\ActionRequested;
 use App\Repository\HostedFileRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\MailerInterface;
 
 class VirusScannerService
@@ -20,11 +22,12 @@ class VirusScannerService
     private HostedFileRepository $hostedFileRepository;
     private MailerInterface $mailer;
     private string $webSiteEmailAddress;
+    private LoggerInterface $logger;
 
     public function __construct(ManagerRegistry $doctrine, string $hostingDirectory,
                                 string $actionsResultsDirectory, string $projectDirectory,
                                 string $kernelEnvironment, HostedFileRepository $hostedFileRepository,
-                                MailerInterface $mailer, string $webSiteEmailAddress)
+                                MailerInterface $mailer, string $webSiteEmailAddress, LoggerInterface $logger)
     {
         $this->doctrine = $doctrine;
         $this->hostingDirectory = $hostingDirectory;
@@ -34,6 +37,7 @@ class VirusScannerService
         $this->hostedFileRepository = $hostedFileRepository;
         $this->mailer = $mailer;
         $this->webSiteEmailAddress = $webSiteEmailAddress;
+        $this->logger = $logger;
     }
 
     public function runCommand(ActionRequested $actionRequested): void
@@ -106,14 +110,53 @@ class VirusScannerService
 
         $hostedFile->setScanResult($scanResult);
         $hostedFile->setScaned(true);
+
+        if ($actionRequested->getUser()->isSendEmailAfterEachAction()) {
+            try {
+                $this->notifyUserByEmail($scanResult, $isInfected, $actionRequested->getUser(), $hostedFile);
+                $actionRequested->setUserIsNotifiedByEmail('ok');
+            } catch (\Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface $exception) {
+                $this->logger->error($exception->getMessage());
+                $actionRequested->setUserIsNotifiedByEmail('ko');
+            }
+        }
+
+        if ($actionRequested->getUser()->isSendEmailIfFileIsInfected() && !$actionRequested->getUser()->isSendEmailAfterEachAction()) {
+            try {
+                $this->notifyUserByEmail($scanResult, $isInfected, $actionRequested->getUser(), $hostedFile);
+                $actionRequested->setUserIsNotifiedByPostQuery('ok');
+            } catch (\Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface $exception) {
+                $this->logger->error($exception->getMessage());
+                $actionRequested->setUserIsNotifiedByPostQuery('ko');
+            }
+        }
+
+        if ($actionRequested->getUser()->isSendPostToUrlAfterEachAction()) {
+            try {
+                $this->notifyUserByPostRequest($scanResult, $isInfected, $actionRequested->getUser(), $hostedFile);
+                $actionRequested->setUserIsNotifiedByPostQuery('ok');
+            } catch (\Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface $exception) {
+                $this->logger->error($exception->getMessage());
+                $actionRequested->setUserIsNotifiedByPostQuery('ko');
+            }
+        }
+
+        if ($actionRequested->getUser()->isSendPostToUrlIfFileIsInfected() && !$actionRequested->getUser()->isSendPostToUrlAfterEachAction()) {
+            try {
+                $this->notifyUserByPostRequest($scanResult, $isInfected, $actionRequested->getUser(), $hostedFile);
+                $actionRequested->setUserIsNotifiedByPostQuery('ok');
+            } catch (\Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface $exception) {
+                $this->logger->error($exception->getMessage());
+                $actionRequested->setUserIsNotifiedByPostQuery('ko');
+            }
+        }
+
         $em = $this->doctrine->getManager();
         $em->persist($hostedFile);
         $em->flush();
-
-        $this->notifyUser($scanResult, $isInfected, $actionRequested->getUser(), $hostedFile);
     }
 
-    private function notifyUser($scanResult, $isInfected, $user, $hostedFile): void
+    private function notifyUserByEmail($scanResult, $isInfected, $user, $hostedFile): void
     {
         $subject = $isInfected === true ? 'Your file is infected' : 'Your file is safe';
         if ($user->isSendEmailAfterEachAction()) {
@@ -130,10 +173,38 @@ class VirusScannerService
                     'scanResult' => $scanResult,
                     'fileDescription' => $hostedFile->getDescription(),
                     'lang' => 'en',
-                    'isInfected' => $isInfected
+                    'isInfected' => $isInfected,
                 ]);
 
-            $this->mailer->send($email);
+            try {
+                $this->mailer->send($email);
+            } catch (\Exception $exception) {
+                $this->logger->error($exception->getMessage());
+            }
+        }
+    }
+
+    /**
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    private function notifyUserByPostRequest($scanResult, $isInfected, $user, $hostedFile): void
+    {
+        $subject = $isInfected === true ? 'Your file is infected' : 'Your file is safe';
+        $url = $user->getPostUrlAfterAction();
+        if ($user->isSendPostToUrlAfterEachAction()) {
+            $httpClient = HttpClient::create();
+            try {
+                $httpClient->request('POST', $url, [
+                    'body' => [
+                        'message' => $subject,
+                        'infected' => $isInfected,
+                        'fileDescription' => $hostedFile->getDescription(),
+                        'scanReport' => $scanResult,
+                    ],
+                ]);
+            } catch (\Exception $exception) {
+                $this->logger->error($exception->getMessage());
+            }
         }
     }
 
@@ -149,7 +220,7 @@ Known viruses: 8641488
 Engine version: 0.103.7
 Scanned directories: 0
 Scanned files: 1
-Infected files: 0
+Infected files: 1
 Data scanned: 24.87 MB
 Data read: 14.12 MB (ratio 1.76:1)
 Time: 41.191 sec (0 m 41 s)

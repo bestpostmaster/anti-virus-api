@@ -55,6 +55,8 @@ class HostedFileFixtures extends Fixture implements DependentFixtureInterface
             $actionRequested->setHostedFileIds([]);
             $actionRequested->setActionResults([]);
             $actionRequested->setUser($item['user']);
+            $actionRequested->setUserIsNotifiedByEmail('off');
+            $actionRequested->setUserIsNotifiedByPostQuery('off');
 
             $manager->persist($file);
             $manager->flush($file);
