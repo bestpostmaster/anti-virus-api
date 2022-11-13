@@ -202,7 +202,7 @@ class FilesController extends AbstractController
      *     "/{_locale}/free/{serviceDescription}",
      *     name="service",
      *     requirements={
-     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
      *     }
      * )
      */

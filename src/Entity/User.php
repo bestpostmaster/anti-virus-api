@@ -102,8 +102,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $dateOfBirth;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @groups("user:read", "file:read")
+     */
+    private \DateTimeInterface $passwordDate;
+
     /** @ORM\Column(type="boolean", nullable=true) */
     private $isBanned = false;
+
+    /** @ORM\Column(type="boolean", nullable=true) */
+    private $deleteAccountRequested = false;
 
     /** @ORM\Column(type="boolean", nullable=false)
      * @groups("user:read", "file:read")
@@ -517,5 +526,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSendPostToUrlIfFileIsInfected(bool $sendPostToUrlIfFileIsInfected): void
     {
         $this->sendPostToUrlIfFileIsInfected = $sendPostToUrlIfFileIsInfected;
+    }
+
+    public function getPasswordDate(): \DateTimeInterface
+    {
+        return $this->passwordDate;
+    }
+
+    public function setPasswordDate(\DateTimeInterface $passwordDate): void
+    {
+        $this->passwordDate = $passwordDate;
+    }
+
+    public function isDeleteAccountRequested(): bool
+    {
+        return $this->deleteAccountRequested;
+    }
+
+    public function setDeleteAccountRequested(bool $deleteAccountRequested): void
+    {
+        $this->deleteAccountRequested = $deleteAccountRequested;
     }
 }

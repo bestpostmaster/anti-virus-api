@@ -16,7 +16,7 @@ class AccountController extends AbstractController
      *     "/{_locale}/create-account",
      *     name="app_create_account",
      *     requirements={
-     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
      *     }
      * )
      */
@@ -32,7 +32,7 @@ class AccountController extends AbstractController
      *     "/{_locale}/private-space",
      *     name="private_space",
      *     requirements={
-     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
      *     }
      * )
      */

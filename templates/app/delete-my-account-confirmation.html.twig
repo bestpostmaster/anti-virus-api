@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+    {%  include 'app/common-head-tags.html.twig' %}
+
+    <title>Delete my account and personal data | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
+    <meta name="description" content="Delete my account and personal data, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
+</head>
+<body>
+
+<div class="content">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+
+                <div class="row align-items-center">
+                    <div class="col-lg-7 mb-5 mb-lg-0">
+
+                        <h3 class="mb-4">Delete my account and personal data</h3>
+                        {% if found %}
+                            <p><b>Please note that this action is irreversible, all your files will be deleted.</b></p>
+
+                            <h5>Please be patient, this operation may take a few minutes. Do not close this window..</h5>
+
+                            <br><br>
+                            Deletion of your files and personal data in progress..
+
+                            <form class="border-right pr-5 mb-5" method="post" id="deleteMyAccountForm" name="deleteMyAccountForm">
+                                <img src="/images/loading.gif" />
+                            </form>
+
+                            <div id="form-message-warning"></div>
+                            <div id="form-message-success">
+                                <div class="row">
+                                    <div class="col-md-12 form-group">
+                                        <label for="avatar">To permanently delete your account and your personal data, you must click on the link you received by email. If you do not receive a message, check the spam folder of your mailbox.</label>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <h3>A technical error has occurred, please contact the site administrator</h3>
+                            <p><a href="/{{ lang }}/contact">{{ 'Contact us' | trans }}</a></p>
+                        {% endif %}
+                    </div>
+                    <div class="col-lg-4 ml-auto">
+                        <br>
+                        <h3 class="mb-4">API for developers [JSON / REST API]</h3>
+                        <p>Start scanning user uploaded content and files within minutes. Our JSON API is easy to integrate and quickly lets you scan without overloading your servers.</p>
+                        <p><a href="/{{ lang }}/documentation">Read more</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{%  include 'app/common-js-sources.html.twig' %}
+
+<script src="/js/delete-my-account-confirmation.js"></script>
+</body>
+</html>
+

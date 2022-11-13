@@ -3,8 +3,8 @@
 <head>
     {%  include 'app/common-head-tags.html.twig' %}
 
-    <title>Change my password, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
-    <meta name="description" content="Change my password, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
+    <title>Delete my account and personal data | AntiVirus API(JSON) for Developers | Run a free virus scan online</title>
+    <meta name="description" content="Delete my account and personal data, Free Online Scanner | AntiVirus API(JSON) for Developers | Run a free virus scan online | Free Online Security Scan · Detect and fix viruses, worms, spyware, and other malicious threats for free. · Start a free scan for your platform">
 </head>
 <body>
 
@@ -16,9 +16,11 @@
                 <div class="row align-items-center">
                     <div class="col-lg-7 mb-5 mb-lg-0">
 
-                        <h3 class="mb-4">Change my password</h3>
+                        <h3 class="mb-4">Delete my account and personal data</h3>
 
-                        <form class="border-right pr-5 mb-5" method="post" id="changeMyPasswordForm" name="changeMyPasswordForm">
+                        <p><b>Please note that this action is irreversible, all your files will be deleted.</b></p>
+
+                        <form class="border-right pr-5 mb-5" method="post" id="deleteMyAccountForm" name="deleteMyAccountForm">
                                 <img src="/images/loading.gif" />
                         </form>
 
@@ -26,19 +28,20 @@
                         <div id="form-message-success">
                             <div class="row">
                                 <div class="col-md-12 form-group">
-                                    <label for="avatar">Your password has been successfully changed</label>
+                                    <label for="avatar">To permanently delete your account and your personal data, you must click on the link you received by email. If you do not receive a message, check the spam folder of your mailbox.</label>
                                 </div>
                             </div>
                         </div>
 
                     </div>
                     <div class="col-lg-4 ml-auto">
+                        <br><br><br>
                         <p>
                             <a href="/{{ lang }}/private-space" id="btn-documentation" value="API Documentation" class="btn btn-info rounded-0 py-2 px-4">Home</a><br><br>
+                            <a href="/{{ lang }}/user/settings" id="btn-documentation" value="API Documentation" class="btn btn-info rounded-0 py-2 px-4">Settings</a><br><br>
                             <a href="/{{ lang }}/user/change-my-password" id="btn-documentation" value="API Documentation" class="btn btn-info rounded-0 py-2 px-4">Change my password</a><br><br>
                             <a href="/{{ lang }}/user/delete-my-account" id="btn-documentation" value="API Documentation" class="btn btn-info rounded-0 py-2 px-4">Delete my account</a><br><br>
                             <input type="button" id="btn-log-out" value="Log out" class="btn btn-primary rounded-0 py-2 px-4">
-
                         </p>
                         <br>
                         <h3 class="mb-4">API for developers [JSON / REST API]</h3>
@@ -53,7 +56,7 @@
 
 {%  include 'app/common-js-sources.html.twig' %}
 
-<script src="/js/change-my-password.js"></script>
+<script src="/js/delete-my-account.js"></script>
 </body>
 </html>
 

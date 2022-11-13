@@ -9,6 +9,10 @@ composer install
 
 !!VAULT!! Check username and database name in .env file and run this command to choose the password :
 php bin/console secrets:generate-keys
+
+To check secrets before generation :
+php bin/console secrets:list --reveal
+
 php bin/console secrets:set DATABASE_PASSWORD
 php bin/console secrets:set ADMIN_PASSWORD
 php bin/console secrets:set DEFAULT_USER_PASSWORD

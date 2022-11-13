@@ -57,7 +57,7 @@ class StatusController extends AbstractController
      *     "/{_locale}/test-translator",
      *     name="test-translator",
      *     requirements={
-     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
      *     }
      * )
      */

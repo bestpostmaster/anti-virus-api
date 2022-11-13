@@ -36,27 +36,22 @@ $(function() {
 			'\n' +
 			'							<div className="row">\n' +
 			'								<div className="col-md-12 form-group">\n' +
-			'									<input type="password" className="form-control" name="password1" id="password1"\n' +
-			'				   					placeholder="Password">\n' +
+			'\n 								You must first enter your password<br>' +
+			'									<input type="password" className="form-control" name="password1" id="password1" placeholder="Password">\n' +
+			'									<input type="hidden" className="form-control" name="lang" value="'+LANG+'">\n' +
 			'									</div>\n' +
 			'							</div><br>\n' +
 			'\n' +
-			'							<div className="row">\n' +
-			'								<div className="col-md-12 form-group">\n' +
-			'									<input type="password" className="form-control" name="password2" id="password2"\n' +
-			'			   						placeholder="Repeat password">\n' +
-			'								</div>\n' +
-			'							 </div><br><br>\n' +
 			'                            <div class="row">\n' +
 			'                                <div class="col-md-12">\n' +
-			'                                    <input type="submit" value="Save" class="btn btn-primary rounded-0 py-2 px-4">\n' +
+			'                                    <input type="submit" value="Delete my account and personal data" class="btn btn-primary rounded-0 py-2 px-4">\n' +
 			'                                    <span class="submitting"></span>\n' +
 			'                                </div>\n' +
 			'                            </div>';
 	}
 
 	function updateFormView(content) {
-		$('#changeMyPasswordForm').html(content);
+		$('#deleteMyAccountForm').html(content);
 	}
 
 	function getUserInfos() {
@@ -83,27 +78,17 @@ $(function() {
 
 	getUserInfos();
 
-	var submitChangeMyPasswordForm = function() {
-		if ($('#changeMyPasswordForm').length > 0) {
-			$("#changeMyPasswordForm").validate({
+	var submitDeleteMyAccountForm = function() {
+		if ($('#deleteMyAccountForm').length > 0) {
+			$("#deleteMyAccountForm").validate({
 				rules: {
 					password1: {
 						required: true,
-						minlength: 8
-					},
-					password2: {
-						required: true,
-						equalTo: "#password1",
 						minlength: 8
 					}
 				},
 				messages: {
 					password1: {
-						minlength: "Minimum length: 8 characters",
-					},
-					password2: {
-						required: "Please enter your password",
-						equalTo: "Please enter the same password as above",
 						minlength: "Minimum length: 8 characters",
 					}
 				},
@@ -112,7 +97,7 @@ $(function() {
 						waitText = 'Submitting...';
 					$.ajax({
 						type: "POST",
-						url: "/api/user/change-my-password/"+sessionStorage.getItem('userId'),
+						url: "/api/user/delete-my-account/"+sessionStorage.getItem('userId'),
 						contentType: "application/json",
 						dataType: "json",
 						headers: {
@@ -152,5 +137,5 @@ $(function() {
 		}
 	}
 
-	submitChangeMyPasswordForm();
+	submitDeleteMyAccountForm();
 });

@@ -16,7 +16,7 @@ class DocumentationController extends AbstractController
      *     "/{_locale}/documentation",
      *     name="documentation",
      *     requirements={
-     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
      *     }
      * )
      */

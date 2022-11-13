@@ -17,25 +17,26 @@
             <div class="col-md-10">
                 <div class="row align-items-center">
                     <div class="col-lg-16 mb-5 mb-lg-0">
+                        <div id="top_buttons" style="text-align: right;width: 100%"><p><a href="/{{ lang }}/private-space" id="btn-documentation" value="API Documentation" class="btn btn-info rounded-0 py-2 px-4">Home</a><a type="button" id="btn-settings" href="/{{ lang }}/user/settings" class="btn btn-info rounded-0 py-2 px-4">Settings</a><a href="/{{ lang }}/contact" id="btn-documentation" value="API Documentation" class="btn btn-info rounded-0 py-2 px-4">Contact us</a><input type="button" id="btn-log-out" value="Log out" class="btn btn-primary rounded-0 py-2 px-4"></p><br></div>
                         <h3 class="mb-4">Documentation</h3>
                         <div class="row">
                             <div class="col-md-16 form-group">
-                                <b>This API is simple to use. You just have to follow these steps</b><br><br>
+                                <b>&nbsp;&nbsp;&nbsp;&nbsp;This API is simple to use. You just have to follow these steps</b><br><br>
 
                                 <ul>
                                     <li><a href="/{{ lang }}/create-account">Create a free account</a></li>
                                     <li>Click on the link you receive by email to confirm your address</li>
                                     <li>Generate a token with credentials</li>
 
-                                    <p>You can use any language to make this CURL call. (Python, PHP, Java, JavaScript...)</p>
+                                    <p>You can use any language to make this CURL call. (Python, PHP, Java, JavaScript...) <a href="/{{ lang }}/contact">Need help ?</a></p>
 
-                                    <textarea class="codeBlock" rows="8">curl --location --request POST 'http://anti-virus-api.com/api/login_check' \
+                                    <textarea class="codeBlock" rows="6">curl --location --request POST 'http://anti-virus-api.com/api/login_check' \
                                         --header 'Content-Type: application/json' \
                                         --data-raw '{"username":"YOUR_LOGIN","password":"YOUR_PASSWORD"}'
                                     </textarea> <br>
 
                                     If your credentials are correct, our server will provide you with a token as a response :
-                                    <textarea class="codeBlock" rows="8">{"token": "YOUR_TOKEN","refresh_token": "YOUR_REFRESH_TOKEN"}
+                                    <textarea class="codeBlock" rows="3">{"token": "YOUR_TOKEN","refresh_token": "YOUR_REFRESH_TOKEN"}
                                     </textarea>
                                     <br>
                                     YOUR_TOKEN is valid for one hour, its duration can be extended using YOUR_REFRESH_TOKEN
@@ -44,7 +45,7 @@
                                     <br><br>
                                     <li>Use the token to upload the file on our server </li>
 
-                                    <textarea class="codeBlock" rows="16">curl --location --request POST 'http://anti-virus-api.local.com/api/files/upload' \
+                                    <textarea class="codeBlock" rows="9">curl --location --request POST 'http://anti-virus-api.local.com/api/files/upload' \
                                         --header 'Authorization: Bearer YOUR_TOKEN' \
                                         --form 'file=@"file.pdf"' \
                                         --form 'description="My awesome file"'
@@ -53,7 +54,7 @@
                                     <br><br>
                                     <li>A refresh token is a credential artifact that lets a client application get new access tokens without having to ask the user to log in again </li>
 
-                                    <textarea class="codeBlock" rows="16">curl --location --request POST 'http://anti-virus-api.local.com/api/files/upload' \
+                                    <textarea class="codeBlock" rows="9">curl --location --request POST 'http://anti-virus-api.local.com/api/files/upload' \
                                         --header 'Authorization: Bearer YOUR_TOKEN' \
                                         --form 'file=@"file.pdf"' \
                                         --form 'description="My awesome file"'

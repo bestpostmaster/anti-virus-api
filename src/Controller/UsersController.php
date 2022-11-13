@@ -11,10 +11,12 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Psr\Log\LoggerInterface;
 
 class UsersController extends AbstractController
 {
@@ -28,8 +30,12 @@ class UsersController extends AbstractController
     private string $webSiteDomainName;
     private string $webSiteHomeUrl;
     private string $webSiteEmailAddress;
+    private MailerInterface $mailer;
+    private LoggerInterface $logger;
 
-    public function __construct(UserPasswordHasherInterface $passwordEncoder, DenormalizerInterface $denormalizer, string $webSiteName, string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress)
+    public function __construct(UserPasswordHasherInterface $passwordEncoder, DenormalizerInterface $denormalizer, string $webSiteName,
+                                string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress,
+                                MailerInterface $mailer, LoggerInterface $logger)
     {
         $this->passwordEncoder = $passwordEncoder;
         $this->denormalizer = $denormalizer;
@@ -37,6 +43,8 @@ class UsersController extends AbstractController
         $this->webSiteDomainName = $webSiteDomainName;
         $this->webSiteHomeUrl = $webSiteHomeUrl;
         $this->webSiteEmailAddress = $webSiteEmailAddress;
+        $this->mailer = $mailer;
+        $this->logger = $logger;
     }
 
     /**
@@ -170,11 +178,51 @@ class UsersController extends AbstractController
     }
 
     /**
+     * @Route("/api/user/delete-my-account/{userId}", name="api_delete_my_account")
+     *
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     */
+    public function deleteMyAccount(Request $request, UserRepository $userRepository, ManagerRegistry $doctrine): Response
+    {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            throw new \Exception('Not authorized !');
+        }
+
+        $currentUser = $this->getUser();
+        $data = (array) json_decode($request->getContent());
+        if (!isset($data['password1']) || $data['password1'] === '') {
+            return $this->json(['error' => '151', 'field' => '', 'message' => 'Please check all fields', 'data' => $data], 200);
+        }
+
+        if (!$currentUser || $currentUser->getId() !== (int) $request->get('userId')) {
+            throw new \Exception('Not authorized !');
+        }
+
+        $user = $userRepository->findOneBy(['id' => $request->get('userId')]);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
+        }
+        if (!$this->passwordEncoder->isPasswordValid($user, $data['password1'])) {
+            return $this->json(['error' => '207', 'field' => '', 'message' => 'Please check all fields', 'data' => $data], 200);
+        }
+
+        $this->sendDeleteAccountMail($user, $data['lang']);
+
+        $user->setDeleteAccountRequested(true);
+        $em = $doctrine->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        return $this->json(['status' => 'ok'], 200, [], ['groups' => 'user:read']);
+    }
+
+    /**
      * @Route(
      *     "/{_locale}/users/confirm-email-address/{secret}",
      *     name="confirm_email_address",
      *     requirements={
-     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
      *     }
      * )
      */
@@ -230,7 +278,7 @@ class UsersController extends AbstractController
      *     "/{_locale}/users/register",
      *     name="app_users_register",
      *     requirements={
-     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
      *     }
      * )
      */
@@ -255,6 +303,7 @@ class UsersController extends AbstractController
         ]);
 
         $user->setRegistrationDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $user->setPasswordDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $user->setSecretTokenForValidation(md5(uniqid((string) mt_rand(), true)).md5(uniqid((string) mt_rand(), true)));
         $user->setPassword($this->passwordEncoder->hashPassword(
             $user,
@@ -331,9 +380,6 @@ class UsersController extends AbstractController
         return $user;
     }
 
-    /**
-     * @return void
-     */
     public function hydrateUser(Request $request, User $user): User
     {
         $data = json_decode($request->getContent(), true);
@@ -348,6 +394,8 @@ class UsersController extends AbstractController
                 $user,
                 $data['password1']
             ));
+
+            $user->setPasswordDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         }
 
         empty($data['phoneNumber']) ? true : $user->setPhoneNumber($data['phoneNumber']);
@@ -379,5 +427,33 @@ class UsersController extends AbstractController
         }
 
         return $user;
+    }
+
+    private function sendDeleteAccountMail(User $user, string $lang): void
+    {
+        $subject = 'Delete your account';
+        $link = $this->webSiteHomeUrl.'/'.$lang.'/user/delete-my-account-confirmation/'.$user->getSecretTokenForValidation();
+
+        if ($user->isSendEmailAfterEachAction()) {
+            $email = (new TemplatedEmail())
+                ->from($this->webSiteEmailAddress)
+                ->to($user->getEmail())
+                // ->cc('cc@example.com')
+                // ->bcc('bcc@example.com')
+                // ->replyTo('fabien@example.com')
+                // ->priority(Email::PRIORITY_HIGH)
+                ->subject($subject)
+                ->htmlTemplate('app/mails/delete-account.html.twig')
+                ->context([
+                    'lang' => 'en',
+                    'link' => $link,
+                ]);
+
+            try {
+                $this->mailer->send($email);
+            } catch (\Exception $exception) {
+                $this->logger->error($exception->getMessage());
+            }
+        }
     }
 }

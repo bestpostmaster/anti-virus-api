@@ -37,7 +37,7 @@ class ContactController extends AbstractController
      *     "/{_locale}/contact",
      *     name="contact",
      *     requirements={
-     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
      *     }
      * )
      */
@@ -53,7 +53,7 @@ class ContactController extends AbstractController
      *     "/{_locale}/send-contact-message",
      *     name="send-contact-message",
      *     requirements={
-     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
      *     }
      * )
      */
