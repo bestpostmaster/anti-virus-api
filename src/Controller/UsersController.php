@@ -135,6 +135,41 @@ class UsersController extends AbstractController
     }
 
     /**
+     * @Route("/api/user/change-my-password/{userId}", name="api_change_my_password")
+     *
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     */
+    public function changeMyPassword(Request $request, UserRepository $userRepository, ManagerRegistry $doctrine): Response
+    {
+        if (!$this->container->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            throw new \Exception('Not authorized !');
+        }
+
+        $currentUser = $this->getUser();
+        $data = (array) json_decode($request->getContent());
+        if (!isset($data['password1'], $data['password2']) || $data['password1'] !== $data['password2']) {
+            return $this->json(['error' => '151', 'field' => '', 'message' => 'Please check all fields', 'data' => $data], 200);
+        }
+
+        if (!$currentUser || $currentUser->getId() !== (int) $request->get('userId')) {
+            throw new \Exception('Not authorized !');
+        }
+
+        $user = $userRepository->findOneBy(['id' => $request->get('userId')]);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
+        }
+
+        $user = $this->hydrateUser($request, $user);
+        $em = $doctrine->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        return $this->json(['status' => 'ok'], 200, [], ['groups' => 'user:read']);
+    }
+
+    /**
      * @Route(
      *     "/{_locale}/users/confirm-email-address/{secret}",
      *     name="confirm_email_address",
@@ -307,6 +342,13 @@ class UsersController extends AbstractController
             $user,
             $data['password']
         ));
+
+        if (isset($data['password1']) && $data['password1'] !== '') {
+            $user->setPassword($this->passwordEncoder->hashPassword(
+                $user,
+                $data['password1']
+            ));
+        }
 
         empty($data['phoneNumber']) ? true : $user->setPhoneNumber($data['phoneNumber']);
         empty($data['city']) ? true : $user->setCity($data['city']);

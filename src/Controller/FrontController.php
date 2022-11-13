@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class HomeController extends AbstractController
+class FrontController extends AbstractController
 {
     /**
      * @Route("/", name="app_home")
@@ -57,6 +57,22 @@ class HomeController extends AbstractController
     public function settings(Request $request): Response
     {
         return $this->render('app/settings.html.twig', [
+            'lang' => $request->get('_locale'),
+        ]);
+    }
+
+    /**
+     * @Route(
+     *     "/{_locale}/user/change-my-password",
+     *     name="change_my_password",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi|en",
+     *     }
+     * )
+     */
+    public function changeMyPassword(Request $request): Response
+    {
+        return $this->render('app/change-my-password.html.twig', [
             'lang' => $request->get('_locale'),
         ]);
     }

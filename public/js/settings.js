@@ -39,6 +39,7 @@ $(function() {
 			'                                <div class="col-md-12 form-group">\n' +
 			'									Your e-mail address\n' +
 			'                                    <input type="text" class="form-control" name="email" id="email" value="'+userInfos.email+'" readonly>\n' +
+			'\n								<br><a href="/'+LANG+'/user/change-my-password">Change my password</a>	\n' +
 			'                                </div>\n' +
 			'                            </div><br><br>\n' +
 			'\n' +
