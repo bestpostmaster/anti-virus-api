@@ -40,8 +40,8 @@ final class CommandRunnerMessageHandler implements MessageHandlerInterface
 
     public function __invoke(CommandRunnerMessage $message)
     {
-        if ($this->getFreeMemory() < 1000) {
-            throw new \Exception('Free memory < 1G !');
+        if ($this->getFreeMemory() < 300) {
+            throw new \Exception('Free memory < 1G !, Free : '.$this->getFreeMemory());
         }
 
         $actionRequested = $this->em->find(ActionRequested::class, $message->getActionRequestedId());

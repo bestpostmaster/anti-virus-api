@@ -23,24 +23,24 @@ $(function() {
 				relatedActionsList = element.relatedActions;
 			}
 
-			relatedActionsList.forEach(function(action, index, array)
-			{
-				if(!action.accomplished) {
-					return;
-				}
+			if(relatedActionsList) {
+				relatedActionsList.forEach(function (action, index, array) {
+					if (!action.accomplished) {
+						return;
+					}
 
-				$('#accomplished-'+action.id).html(action.accomplished);
-				$('#startDate-'+action.id).html(action.startTime);
-				$('#endDate-'+action.id).html(action.endTime);
+					$('#accomplished-' + action.id).html(action.accomplished);
+					$('#startDate-' + action.id).html(action.startTime);
+					$('#endDate-' + action.id).html(action.endTime);
 
-				let actionResults = '';
-				(action.actionResults).forEach(function(resultFile, index, array)
-				{
-					actionResults += '<a href="javascript:;" file_name="'+resultFile+'" link="/api/actions/download-action-result/'+action.id+'/'+resultFile+'" class="downloadResultRefreshed">'+resultFile+'</a><br>';
+					let actionResults = '';
+					(action.actionResults).forEach(function (resultFile, index, array) {
+						actionResults += '<a href="javascript:;" file_name="' + resultFile + '" link="/api/actions/download-action-result/' + action.id + '/' + resultFile + '" class="downloadResultRefreshed">' + resultFile + '</a><br>';
+					});
+
+					$('#actionResults-' + action.id).html(actionResults);
 				});
-
-				$('#actionResults-'+action.id).html(actionResults);
-			});
+			}
 
 			if ($("#file-details-"+element.id)) {
 				if (lastElement && lastElement.accomplished === true) {

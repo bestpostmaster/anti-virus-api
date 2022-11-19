@@ -12,7 +12,6 @@ $(function() {
 
 		Object.keys(indexed_array).forEach(
 			key =>	{
-				console.log('key', indexed_array[key]);
 				if (indexed_array[key] === 'true') {
 					indexed_array[key] = true;
 				}

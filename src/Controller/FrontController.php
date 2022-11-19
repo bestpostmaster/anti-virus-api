@@ -108,13 +108,13 @@ class FrontController extends AbstractController
         $user = $userRepository->findOneBy(['secretTokenForValidation' => $request->get('token'), 'deleteAccountRequested' => true]);
         $found = true;
 
-        if(!$user) {
+        if (!$user) {
             $found = false;
         }
 
         return $this->render('app/delete-my-account-confirmation.html.twig', [
             'lang' => $request->get('_locale'),
-            'found' => $found
+            'found' => $found,
         ]);
     }
 }

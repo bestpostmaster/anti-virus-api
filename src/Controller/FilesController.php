@@ -311,7 +311,7 @@ class FilesController extends AbstractController
         $file->setUser($this->getUser());
         $file->setSize($fileSize);
         $file->setScaned(false);
-        $file->setDescription($request->get('description') ?? $url);
+        $file->setDescription(empty($request->get('description')) ? $url : $request->get('description'));
         $file->setFilePassword($request->get('filePassword') ?? '');
         $file->setDownloadCounter(0);
         $file->setUrl(md5(uniqid((string) mt_rand(), true)).md5(uniqid((string) mt_rand(), true)));
