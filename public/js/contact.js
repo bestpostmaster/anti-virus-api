@@ -2,6 +2,13 @@ $(function() {
 
 	'use strict';
 
+	if (!sessionStorage.getItem('token') || sessionStorage.getItem('token')==='') {
+		$('#btn-settings').hide();
+		$('#btn-log-out').hide();
+		$('#btn-change-password').hide();
+		$('#btn-delete-account').hide();
+	}
+
 	function getFormData($form){
 		var unindexed_array = $form.serializeArray();
 		var indexed_array = {};

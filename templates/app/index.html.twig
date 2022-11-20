@@ -7,7 +7,6 @@
     <meta name="description" content="{{ 'TR00002' | trans }}">
 </head>
 <body>
-
 <div class="content">
     <div class="container">
         <div class="row justify-content-center">
@@ -15,7 +14,7 @@
 
                 <div class="row align-items-center">
                     <div class="col-lg-7 mb-5 mb-lg-0">
-
+                        <h1><a href="{{ webSiteHomeUrl }}" title="{{ webSiteHomeUrl }}">{{ webSiteName | upper }}</a></h1><br>
                         <h3 class="mb-4" id="h-top">{{ 'TR00003' | trans }}</h3>
                         <form class="border-right pr-5 mb-5" method="post" id="loginForm" name="contactForm">
                             <div class="row">
@@ -32,7 +31,7 @@
 
                             <div class="row">
                                 <div class="col-md-12">
-                                    <input type="submit" value="{{ 'Login' | trans }}" class="btn btn-primary rounded-0 py-2 px-4">
+                                    <input type="submit" value="{{ 'Login' | trans }}" class="btn btn-primary rounded-0 py-2 px-4">&nbsp;&nbsp;<a href="/{{ lang }}/create-account">I don't have a login</a>
                                     <span class="{{ 'submitting' | trans }}"></span>
                                 </div>
                             </div>

@@ -555,6 +555,11 @@ $(function() {
 
 	var uploadForm = function() {
 
+		if (!sessionStorage.getItem('token') || sessionStorage.getItem('token')==='') {
+			document.location.href="/";
+			return;
+		}
+
 		let files = getFilesList();
 		displayFilesList(files, 'files-list');
 		initRefreshTokenCalls();
@@ -642,5 +647,10 @@ $(function() {
 			} );
 		}
 	};
+	if (!sessionStorage.getItem('token') || sessionStorage.getItem('token')==='') {
+		$('#uploadForm').hide();
+		document.location.href="/";
+		return;
+	}
 	uploadForm();
 });
