@@ -76,6 +76,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", nullable=true)
      * @groups("user:read", "file:read")
      */
+    private $ip;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @groups("user:read", "file:read")
+     */
     private $preferredLanguage;
 
     /**
@@ -559,5 +565,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDeleteAccountConfirmed(bool $deleteAccountConfirmed): void
     {
         $this->deleteAccountConfirmed = $deleteAccountConfirmed;
+    }
+
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
+    public function setIp($ip): void
+    {
+        $this->ip = $ip;
     }
 }

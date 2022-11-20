@@ -324,6 +324,11 @@ class UsersController extends AbstractController
             return $this->json(['error' => '145', 'field' => 'email', 'message' => 'This email address already exists in our database', 'data' => $data], 200, [], ['status' => 'ko', 'message' => 'This email address already exists in our database']);
         }
 
+        $subscriptionsWithThSameIp = $userRepository->findBy(['ip' => $request->getClientIp(), 'emailConfirmed' => false]);
+        if (count($subscriptionsWithThSameIp) > 3) {
+            return $this->json(['error' => '329', 'field' => 'email', 'message' => 'You have several current registrations. Check your mailboxes', 'data' => $data], 200, [], ['status' => 'ko', 'message' => 'You have several current registrations. Check your mailboxes']);
+        }
+
         $user = new User();
         $user->setLogin($data['email']);
         $user->setEmail($data['email']);
@@ -338,6 +343,7 @@ class UsersController extends AbstractController
             $user,
             $data['password1']
         ));
+        $user->setIp($request->getClientIp());
 
         $manager = $doctrine->getManager();
         $manager->persist($user);
