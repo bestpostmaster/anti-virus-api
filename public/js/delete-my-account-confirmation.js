@@ -44,10 +44,11 @@ $(function() {
 			beforeSend: function() {
 			},
 			success: function(response) {
-				alert('SUCCESS');
+				$('#deleteMyAccountForm').html('<h1>All your personal data has been deleted</h1>');
 			},
 			error: function(request, status, error) {
 				alert('ERROR');
+				$('#deleteMyAccountForm').html('<h1>A technical problem has occurred. This account may already be deleted.</h1>');
 			}
 		});
 	}
