@@ -104,6 +104,38 @@ class FrontController extends AbstractController
 
     /**
      * @Route(
+     *     "/{_locale}/user/terms-of-use",
+     *     name="terms_of_use",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
+     *     }
+     * )
+     */
+    public function termsOfUse(Request $request): Response
+    {
+        return $this->render('app/terms-of-use.html.twig', [
+            'lang' => $request->get('_locale'),
+        ]);
+    }
+
+    /**
+     * @Route(
+     *     "/{_locale}/user/cookies-and-personal-data",
+     *     name="cookies_and_personal_data",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
+     *     }
+     * )
+     */
+    public function cookiesAndPersonalData(Request $request): Response
+    {
+        return $this->render('app/cookies-and-personal-data.html.twig', [
+            'lang' => $request->get('_locale'),
+        ]);
+    }
+
+    /**
+     * @Route(
      *     "/{_locale}/user/delete-my-account-confirmation/{token}",
      *     name="delete_my_account_confirmation",
      *     requirements={
