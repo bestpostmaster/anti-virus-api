@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\ActionRequestedRepository;
+use App\Repository\HostedFileRepository;
 use App\Repository\UserRepository;
+use App\Service\FileManagerService;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -31,10 +34,11 @@ class UsersController extends AbstractController
     private string $webSiteEmailAddress;
     private MailerInterface $mailer;
     private LoggerInterface $logger;
+    private FileManagerService $fileManagerService;
 
     public function __construct(UserPasswordHasherInterface $passwordEncoder, DenormalizerInterface $denormalizer, string $webSiteName,
                                 string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress,
-                                MailerInterface $mailer, LoggerInterface $logger)
+                                MailerInterface $mailer, LoggerInterface $logger, FileManagerService $fileManagerService)
     {
         $this->passwordEncoder = $passwordEncoder;
         $this->denormalizer = $denormalizer;
@@ -44,6 +48,7 @@ class UsersController extends AbstractController
         $this->webSiteEmailAddress = $webSiteEmailAddress;
         $this->mailer = $mailer;
         $this->logger = $logger;
+        $this->fileManagerService = $fileManagerService;
     }
 
     /**
@@ -245,6 +250,31 @@ class UsersController extends AbstractController
     }
 
     /**
+     * @Route("/api/users/delete-my-account-confirmed", name="delete_my_account_confirmed")
+     */
+    public function deleteMyAccountConfirmed(Request $request, ManagerRegistry $doctrine, UserRepository $userRepository, HostedFileRepository $hostedFileRepository, ActionRequestedRepository $actionRequestedRepository): Response
+    {
+        $data = (array) json_decode($request->getContent());
+
+        $user = $userRepository->findOneBy(['id' => (int) $data['userId'], 'secretTokenForValidation' => $data['secretTokenForValidation'], 'deleteAccountRequested' => true, 'deleteAccountConfirmed' => true]);
+        if (!$user) {
+            throw $this->createNotFoundException('Unknown user id : '.$request->get('userId'));
+        }
+
+        $result = $this->fileManagerService->deleteUserFiles($user);
+
+        if ($result) {
+            $manager = $doctrine->getManager();
+            $manager->remove($user);
+            $manager->flush();
+
+            return $this->json(['status' => 'ok']);
+        }
+
+        return $this->json(['status' => 'ko']);
+    }
+
+    /**
      * @Route("/api/admin/users/add", name="app_users_add")
      */
     public function add(Request $request, ManagerRegistry $doctrine): Response
@@ -348,9 +378,6 @@ class UsersController extends AbstractController
         return $this->json($users, 200, [], ['groups' => 'user:read']);
     }
 
-    /**
-     * @return void
-     */
     public function hydrateUserByAdmin(Request $request, User $user): User
     {
         $data = json_decode($request->getContent(), true);

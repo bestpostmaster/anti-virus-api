@@ -27,6 +27,9 @@
 
                             <form class="border-right pr-5 mb-5" method="post" id="deleteMyAccountForm" name="deleteMyAccountForm">
                                 <img src="/images/loading.gif" />
+                                <input type="hidden" value="{{ lang }}" name="lang">
+                                <input type="hidden" value="{{ userId }}" name="userId">
+                                <input type="hidden" value="{{ secretTokenForValidation }}" name="secretTokenForValidation">
                             </form>
 
                             <div id="form-message-warning"></div>

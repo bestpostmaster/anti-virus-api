@@ -46,6 +46,7 @@ class UserFixtures extends Fixture
             $user->setSendEmailAfterEachAction(false);
             $user->setSendPostToUrlAfterEachAction(false);
             $user->setSendEmailIfFileIsInfected(false);
+            $user->setAuthorizedSizeMo(1000);
             $user->setPassword($this->passwordEncoder->hashPassword(
                 $user,
                 $item['pass']

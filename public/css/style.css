@@ -57,6 +57,14 @@ label.error {
 #form-message-warning, #form-message-success, #form-upload-success {
   display: none; }
 
+#fileUrl {
+  display: none;
+}
+
+#selectFileLink {
+  display: none;
+}
+
 #form-message-warning {
   color: #B90B0B; }
 

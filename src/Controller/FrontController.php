@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repository\UserRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,6 +13,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FrontController extends AbstractController
 {
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+
     /**
      * @Route("/", name="app_home")
      */
@@ -107,14 +115,25 @@ class FrontController extends AbstractController
     {
         $user = $userRepository->findOneBy(['secretTokenForValidation' => $request->get('token'), 'deleteAccountRequested' => true]);
         $found = true;
+        $userId = null;
 
         if (!$user) {
             $found = false;
         }
 
+        if ($user) {
+            $userId = $user->getId();
+            $user->setDeleteAccountConfirmed(true);
+            $manager = $this->doctrine->getManager();
+            $manager->persist($user);
+            $manager->flush($user);
+        }
+
         return $this->render('app/delete-my-account-confirmation.html.twig', [
             'lang' => $request->get('_locale'),
             'found' => $found,
+            'userId' => $userId,
+            'secretTokenForValidation' => $request->get('token'),
         ]);
     }
 }

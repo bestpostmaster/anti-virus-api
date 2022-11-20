@@ -13,6 +13,58 @@ $(function() {
 		}, 1400);
 	});
 
+	$('#uploadFromUrlLink').click(function()
+		{
+			setTimeout(function(){
+				$('#file').fadeOut();
+			}, 500);
+
+			setTimeout(function(){
+				$('#chooseFileLabel').fadeOut();
+			}, 500);
+
+			setTimeout(function(){
+				$('#selectFileLink').fadeOut();
+			}, 500);
+
+			setTimeout(function(){
+				$('#uploadFromUrlLink').fadeOut();
+			}, 500);
+
+			setTimeout(function(){
+				$('#fileUrl').fadeIn();
+			}, 500);
+
+			setTimeout(function(){
+				$('#selectFileLink').fadeIn();
+			}, 500);
+		}
+	);
+
+	$('#selectFileLink').click(function()
+		{
+			setTimeout(function(){
+				$('#fileUrl').fadeOut();
+			}, 500);
+
+			setTimeout(function(){
+				$('#selectFileLink').fadeOut();
+			}, 500);
+
+			setTimeout(function(){
+				$('#file').fadeIn();
+			}, 500);
+
+			setTimeout(function(){
+				$('#chooseFileLabel').fadeIn();
+			}, 500);
+
+			setTimeout(function(){
+				$('#uploadFromUrlLink').fadeIn();
+			}, 500);
+		}
+	);
+
 	var updateTableView = function (elements) {
 		elements.forEach(function(element, index, array)
 		{
@@ -510,7 +562,7 @@ $(function() {
 		if ($('#uploadForm').length > 0 ) {
 			$( "#uploadForm" ).validate( {
 				rules: {
-					file: "required",
+					//file: "required",
 					/*
                     email: {
                         required: true,
@@ -531,17 +583,30 @@ $(function() {
 						waitText = 'Submitting...';
 
 					$('#form-message-warning').html("");
+					var data = new FormData(form);
+					var url = "/api/files/upload";
+
+					if (!data.get('fileUrl') && !data.get('file')) {
+						alert('Please select file or URL');
+						return;
+					}
+
+					if(data.get('fileUrl') && data.get('fileUrl') !== '') {
+						url = "/api/files/upload-from-url";
+						data.set('url', data.get('fileUrl'));
+						data.delete('file');
+					}
 
 					$.ajax({
 						type: "POST",
 						headers: {
 							Authorization: 'Bearer '+sessionStorage.getItem('token')
 						},
-						url: "/api/files/upload",
+						url: url,
 						contentType: false,
 						dataType: "json",
 						enctype: 'multipart/form-data',
-						data: new FormData(form),
+						data: data,
 						processData:false,
 
 						beforeSend: function() {

@@ -114,6 +114,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /** @ORM\Column(type="boolean", nullable=true) */
     private $deleteAccountRequested = false;
 
+    /** @ORM\Column(type="boolean", nullable=true) */
+    private $deleteAccountConfirmed = false;
+
     /** @ORM\Column(type="boolean", nullable=false)
      * @groups("user:read", "file:read")
      */
@@ -546,5 +549,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDeleteAccountRequested(bool $deleteAccountRequested): void
     {
         $this->deleteAccountRequested = $deleteAccountRequested;
+    }
+
+    public function isDeleteAccountConfirmed(): bool
+    {
+        return $this->deleteAccountConfirmed;
+    }
+
+    public function setDeleteAccountConfirmed(bool $deleteAccountConfirmed): void
+    {
+        $this->deleteAccountConfirmed = $deleteAccountConfirmed;
     }
 }
