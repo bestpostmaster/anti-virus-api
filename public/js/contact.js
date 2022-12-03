@@ -9,6 +9,29 @@ $(function() {
 		$('#btn-delete-account').hide();
 	}
 
+	$('#antiSpamCheckBox').on('change', function() {
+		getToken();
+	});
+
+	function getToken() {
+		$.ajax({
+			type: "GET",
+			url: "/api/security/get-public-token",
+			contentType: "application/json",
+			dataType: "json",
+
+			beforeSend: function() {
+			},
+			success: function(response) {
+				if (response.token) {
+					$('#token').val(response.token);
+				}
+			},
+			error: function(request, status, error) {
+			}
+		});
+	}
+
 	function getFormData($form){
 		var unindexed_array = $form.serializeArray();
 		var indexed_array = {};
@@ -30,20 +53,12 @@ $(function() {
 						email: true
 					},
 					message: "required",
-					response1: {
-						required: true
-					},
-					response2: {
-						required: true
-					},
 				},
 				messages: {
 					email: {
 						required: "Please enter a valid email address",
 						email: "Please enter a valid email address",
-					},
-					response1: "Please calculate the requested sum and give the result (numbers)",
-					response2: "Please calculate the requested sum and give the result (numbers)",
+					}
 				},
 				/* submit via ajax */
 				submitHandler: function(form) {
@@ -54,7 +69,7 @@ $(function() {
 
 					$.ajax({
 						type: "POST",
-						url: "/send-contact-message",
+						url: "/"+LANG+"/send-contact-message",
 						contentType: "application/json",
 						dataType: "json",
 						data: JSON.stringify(getFormData($(form))),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\AntiSpamTokenService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,16 +14,15 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ContactController extends AbstractController
 {
-    protected const RESPONSE_ONE = '19';
-    protected const RESPONSE_TWO = '17';
     private MailerInterface $mailer;
     private string $webSiteProtocol;
     private string $webSiteName;
     private string $webSiteDomainName;
     private string $webSiteHomeUrl;
     private string $webSiteEmailAddress;
+    private AntiSpamTokenService $antiSpamTokenService;
 
-    public function __construct(MailerInterface $mailer, string $webSiteProtocol, string $webSiteName, string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress)
+    public function __construct(MailerInterface $mailer, string $webSiteProtocol, string $webSiteName, string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress, AntiSpamTokenService $antiSpamTokenService)
     {
         $this->mailer = $mailer;
         $this->webSiteProtocol = $webSiteProtocol;
@@ -30,6 +30,7 @@ class ContactController extends AbstractController
         $this->webSiteDomainName = $webSiteDomainName;
         $this->webSiteHomeUrl = $webSiteHomeUrl;
         $this->webSiteEmailAddress = $webSiteEmailAddress;
+        $this->antiSpamTokenService = $antiSpamTokenService;
     }
 
     /**
@@ -61,8 +62,7 @@ class ContactController extends AbstractController
     {
         $data = (array) json_decode($request->getContent());
 
-        if (!isset($data['email']) || !isset($data['message']) || !isset($data['response1']) || !isset($data['response2'])
-            || $data['response1'] !== $this::RESPONSE_ONE || $data['response2'] !== $this::RESPONSE_TWO) {
+        if (!isset($data['email']) || !isset($data['message']) || !isset($data['token']) || !$this->antiSpamTokenService->tokenExists($data['token'])) {
             return $this->json($data, 400, [], []);
         }
 
