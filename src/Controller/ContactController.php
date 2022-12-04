@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\AntiSpamTokenService;
+use App\Service\ContactMessageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,8 +22,9 @@ class ContactController extends AbstractController
     private string $webSiteHomeUrl;
     private string $webSiteEmailAddress;
     private AntiSpamTokenService $antiSpamTokenService;
+    private ContactMessageService $contactMessageService;
 
-    public function __construct(MailerInterface $mailer, string $webSiteProtocol, string $webSiteName, string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress, AntiSpamTokenService $antiSpamTokenService)
+    public function __construct(MailerInterface $mailer, string $webSiteProtocol, string $webSiteName, string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress, AntiSpamTokenService $antiSpamTokenService, ContactMessageService $contactMessageService)
     {
         $this->mailer = $mailer;
         $this->webSiteProtocol = $webSiteProtocol;
@@ -31,6 +33,7 @@ class ContactController extends AbstractController
         $this->webSiteHomeUrl = $webSiteHomeUrl;
         $this->webSiteEmailAddress = $webSiteEmailAddress;
         $this->antiSpamTokenService = $antiSpamTokenService;
+        $this->contactMessageService = $contactMessageService;
     }
 
     /**
@@ -65,6 +68,12 @@ class ContactController extends AbstractController
         if (!isset($data['email']) || !isset($data['message']) || !isset($data['token']) || !$this->antiSpamTokenService->tokenExists($data['token'])) {
             return $this->json($data, 400, [], []);
         }
+
+        if($this->contactMessageService->isSpammer($request->getClientIp())) {
+            return $this->json($data, 400, [], []);
+        }
+
+        $this->contactMessageService->addMessage($data['email'], $data['message'], $request->getClientIp());
 
         $email = (new Email())
             ->from($this->webSiteEmailAddress)
