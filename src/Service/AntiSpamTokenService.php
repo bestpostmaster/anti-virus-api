@@ -24,8 +24,10 @@ class AntiSpamTokenService
 
     public function generateToken(): AntiSpamToken
     {
+        $currentTime = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
         $antiSpamToken = new AntiSpamToken();
         $antiSpamToken->setToken(md5(uniqid((string) mt_rand(), true)).md5(uniqid((string) mt_rand(), true)));
+        $antiSpamToken->setCreationDate($currentTime);
 
         $manager = $this->doctrine->getManager();
         $manager->persist($antiSpamToken);
@@ -37,6 +39,8 @@ class AntiSpamTokenService
     public function tokenExists(string $token): bool
     {
         if (!$this->antiSpamTokenRepository->findOneBy(['token' => $token])) {
+            $this->logger->info('Check : Invalid token');
+
             return false;
         }
 
@@ -48,6 +52,8 @@ class AntiSpamTokenService
         $result = $this->antiSpamTokenRepository->findOneBy(['token' => $token]);
 
         if (!$result) {
+            $this->logger->info('Delete : Invalid token');
+
             return false;
         }
 

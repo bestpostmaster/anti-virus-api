@@ -22,6 +22,9 @@ class AntiSpamToken
     /** @ORM\Column(name="token", type="string", length=250, nullable=false, unique=true) */
     private string $token;
 
+    /** @ORM\Column(type="datetime") */
+    private \DateTimeInterface $creationDate;
+
     public function getId(): int
     {
         return $this->id;
@@ -40,5 +43,15 @@ class AntiSpamToken
     public function setToken(string $token): void
     {
         $this->token = $token;
+    }
+
+    public function getCreationDate(): \DateTimeInterface
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(\DateTimeInterface $creationDate): void
+    {
+        $this->creationDate = $creationDate;
     }
 }
