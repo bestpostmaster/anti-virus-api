@@ -40,23 +40,17 @@
                                     <input type="password" class="form-control" name="password2" id="password2" placeholder="Repeat password">
                                 </div>
                             </div>
-
+                            <br>
                             <div class="row">
-                                <div class="col-md-12 form-group">
-                                    <br><br>
-                                    <b>[Anti bot test 1]</b> What is the sum of fifteen and four ?<br>
-                                    <input type="text" class="form-control" name="response1" id="response1" placeholder="596">
+                                <br><b>Please check this box</b><br>
+                                <div class="form-check" style="margin-left: 25px;">
+                                    <input type="hidden" value="" name="token" id="token">
+                                    <input class="form-check-input" type="checkbox" value="" id="antiSpamCheckBox" />
+                                    <label class="form-check-label" for="antiSpamCheckBox">I am not a bot</label>
+                                    <div id="loading"></div>
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-12 form-group">
-                                    <br><br>
-                                    <b>[Anti bot test 2]</b> What is the sum of twelve and five ?<br>
-                                    <input type="text" class="form-control" name="response2" id="response2" placeholder="214">
-                                </div>
-                            </div>
-
+                            <br><br>
                             <div class="row">
                                 <div class="col-md-12">
                                     <input type="submit" value="Subscribe" class="btn btn-primary rounded-0 py-2 px-4">

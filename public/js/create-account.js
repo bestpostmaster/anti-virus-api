@@ -13,6 +13,15 @@ $(function() {
 		return indexed_array;
 	}
 
+	$('#antiSpamCheckBox').on('change', function() {
+		if($(this).is(":checked")) {
+			getToken();
+			return;
+		}
+		$('#token').val('');
+		$('#loading').html('');
+	});
+
 	var subscribeForm = function() {
 
 		if ($('#subscribeForm').length > 0 ) {
@@ -26,13 +35,7 @@ $(function() {
 					email: {
 						required: true,
 						email: true
-					},
-					response1: {
-						required: true
-					},
-					response2: {
-						required: true
-					},
+					}
 				},
 				messages: {
 					email: {
@@ -43,9 +46,7 @@ $(function() {
 					password2: {
 						required: "Please enter your password",
 						equalTo: "Please enter the same password as above"
-					},
-					response1: "Please calculate the requested sum and give the result (numbers)",
-					response2: "Please calculate the requested sum and give the result (numbers)",
+					}
 				},
 				/* submit via ajax */
 				submitHandler: function(form) {

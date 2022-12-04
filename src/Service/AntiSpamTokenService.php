@@ -38,6 +38,12 @@ class AntiSpamTokenService
 
     public function tokenExists(string $token): bool
     {
+        if (trim($token) === '') {
+            $this->logger->info('Check : Empty token');
+
+            return false;
+        }
+
         if (!$this->antiSpamTokenRepository->findOneBy(['token' => $token])) {
             $this->logger->info('Check : Invalid token');
 

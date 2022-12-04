@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Repository\ActionRequestedRepository;
 use App\Repository\HostedFileRepository;
 use App\Repository\UserRepository;
+use App\Service\AntiSpamTokenService;
 use App\Service\FileManagerService;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -24,8 +25,6 @@ class UsersController extends AbstractController
 {
     protected const DEFAULT_LIMIT = 10;
     protected const DEFAULT_OFFSET = 0;
-    protected const RESPONSE_ONE = '19';
-    protected const RESPONSE_TWO = '17';
     private UserPasswordHasherInterface $passwordEncoder;
     private DenormalizerInterface $denormalizer;
     private string $webSiteName;
@@ -35,10 +34,11 @@ class UsersController extends AbstractController
     private MailerInterface $mailer;
     private LoggerInterface $logger;
     private FileManagerService $fileManagerService;
+    private AntiSpamTokenService $antiSpamTokenService;
 
     public function __construct(UserPasswordHasherInterface $passwordEncoder, DenormalizerInterface $denormalizer, string $webSiteName,
                                 string $webSiteDomainName, string $webSiteHomeUrl, string $webSiteEmailAddress,
-                                MailerInterface $mailer, LoggerInterface $logger, FileManagerService $fileManagerService)
+                                MailerInterface $mailer, LoggerInterface $logger, FileManagerService $fileManagerService, AntiSpamTokenService $antiSpamTokenService)
     {
         $this->passwordEncoder = $passwordEncoder;
         $this->denormalizer = $denormalizer;
@@ -49,6 +49,7 @@ class UsersController extends AbstractController
         $this->mailer = $mailer;
         $this->logger = $logger;
         $this->fileManagerService = $fileManagerService;
+        $this->antiSpamTokenService = $antiSpamTokenService;
     }
 
     /**
@@ -315,7 +316,7 @@ class UsersController extends AbstractController
     {
         $data = (array) json_decode($request->getContent());
 
-        if (!isset($data['email'], $data['password1'], $data['password2'], $data['response1'], $data['response2']) || $data['response1'] !== $this::RESPONSE_ONE || $data['response2'] !== $this::RESPONSE_TWO) {
+        if (!isset($data['email'], $data['password1'], $data['password2'], $data['token']) || !$this->antiSpamTokenService->tokenExists($data['token'])) {
             return $this->json(['error' => '140', 'field' => '', 'message' => 'Please check all fields', 'data' => $data], 200, [], ['status' => 'ko', 'message' => 'This email address already exists in our database']);
         }
 
@@ -335,6 +336,8 @@ class UsersController extends AbstractController
         $user->setRoles([
             'ROLE_USER',
         ]);
+
+        // $date->format('Y-m-d H:i:sP') to add the time zone in DB
 
         $user->setRegistrationDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $user->setPasswordDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
