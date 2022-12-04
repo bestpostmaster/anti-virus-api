@@ -30,7 +30,7 @@
 
                                     <p>You can use any language to make this CURL call. (Python, PHP, Java, JavaScript...) <a href="/{{ lang }}/contact">Need help ?</a></p>
 
-                                    <textarea class="codeBlock" rows="6">curl --location --request POST 'http://anti-virus-api.com/api/login_check' \
+                                    <textarea class="codeBlock" rows="6">curl --location --request POST '{{ webSiteHomeUrl }}/api/login_check' \
                                         --header 'Content-Type: application/json' \
                                         --data-raw '{"username":"YOUR_LOGIN","password":"YOUR_PASSWORD"}'
                                     </textarea> <br>
@@ -45,7 +45,7 @@
                                     <br><br>
                                     <li>Use the token to upload the file on our server </li>
 
-                                    <textarea class="codeBlock" rows="9">curl --location --request POST 'http://anti-virus-api.local.com/api/files/upload' \
+                                    <textarea class="codeBlock" rows="9">curl --location --request POST '{{ webSiteHomeUrl }}/api/files/upload' \
                                         --header 'Authorization: Bearer YOUR_TOKEN' \
                                         --form 'file=@"file.pdf"' \
                                         --form 'description="My awesome file"'
@@ -54,7 +54,7 @@
                                     <br><br>
                                     <li>A refresh token is a credential artifact that lets a client application get new access tokens without having to ask the user to log in again </li>
 
-                                    <textarea class="codeBlock" rows="9">curl --location --request POST 'http://anti-virus-api.local.com/api/files/upload' \
+                                    <textarea class="codeBlock" rows="9">curl --location --request POST '{{ webSiteHomeUrl }}/api/files/upload' \
                                         --header 'Authorization: Bearer YOUR_TOKEN' \
                                         --form 'file=@"file.pdf"' \
                                         --form 'description="My awesome file"'
