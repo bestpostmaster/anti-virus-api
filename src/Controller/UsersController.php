@@ -183,6 +183,45 @@ class UsersController extends AbstractController
     }
 
     /**
+     * @Route("/api/user/regenerate-a-new-password", name="regenerate_a_new_password")
+     *
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     */
+    public function regenerateANewPassword(Request $request, UserRepository $userRepository, ManagerRegistry $doctrine): Response
+    {
+        $data = (array) json_decode($request->getContent());
+        if (!isset($data['password1'], $data['password2'], $data['email'], $data['token'], $data['token-for-validation']) || $data['password1'] !== $data['password2']) {
+            return $this->json(['error' => '194', 'field' => '', 'message' => 'Please check all fields', 'data' => $data], 200);
+        }
+
+        if (!$this->antiSpamTokenService->tokenExists($data['token'])) {
+            return $this->json(['error' => '198', 'field' => '', 'message' => 'Please check all fields', 'data' => $data], 200);
+        }
+
+        $user = $userRepository->findOneBy([
+            'email' => strtolower($data['email']),
+            'secretTokenForValidation' => $data['token-for-validation'],
+            'newPasswordRequested' => true
+        ]);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Unknown user email : '.$request->get('userId'));
+        }
+
+        $user->setPassword($this->passwordEncoder->hashPassword(
+            $user,
+            $data['password1']
+        ));
+
+        $user->setPasswordDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $em = $doctrine->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        return $this->json(['status' => 'ok'], 200, [], ['groups' => 'user:read']);
+    }
+
+    /**
      * @Route("/api/user/delete-my-account/{userId}", name="api_delete_my_account")
      *
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
@@ -387,6 +426,33 @@ class UsersController extends AbstractController
         return $this->json($users, 200, [], ['groups' => 'user:read']);
     }
 
+    /**
+     * @Route("/api/users/{lang}/send-forgot-my-password", name="app_users")
+     */
+    public function sendForgotMyPassword(Request $request, UserRepository $userRepository, ManagerRegistry $doctrine): Response
+    {
+        $lang = $request->get('lang');
+        $data = (array) json_decode($request->getContent());
+
+        if (!isset($data['email']) || !isset($data['token']) || !$this->antiSpamTokenService->tokenExists($data['token'])) {
+            return $this->json($data, 400, [], []);
+        }
+
+        $user = $userRepository->findOneBy(['email' => $data['email']]);
+        if (!$user) {
+            return $this->json(['status' => 'ok'], 200, [], ['groups' => 'user:read']);
+        }
+
+        $user->setNewPasswordRequested(true);
+        $em = $doctrine->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        $this->sendRegeneratePasswordLink($user, $lang);
+
+        return $this->json(['status' => 'ok'], 200, [], ['groups' => 'user:read']);
+    }
+
     public function hydrateUserByAdmin(Request $request, User $user): User
     {
         $data = json_decode($request->getContent(), true);
@@ -469,26 +535,50 @@ class UsersController extends AbstractController
         $subject = 'Delete your account';
         $link = $this->webSiteHomeUrl.'/'.$lang.'/user/delete-my-account-confirmation/'.$user->getSecretTokenForValidation();
 
-        if ($user->isSendEmailAfterEachAction()) {
-            $email = (new TemplatedEmail())
-                ->from($this->webSiteEmailAddress)
-                ->to($user->getEmail())
-                // ->cc('cc@example.com')
-                // ->bcc('bcc@example.com')
-                // ->replyTo('fabien@example.com')
-                // ->priority(Email::PRIORITY_HIGH)
-                ->subject($subject)
-                ->htmlTemplate('app/mails/delete-account.html.twig')
-                ->context([
-                    'lang' => 'en',
-                    'link' => $link,
-                ]);
+        $email = (new TemplatedEmail())
+            ->from($this->webSiteEmailAddress)
+            ->to($user->getEmail())
+            // ->cc('cc@example.com')
+            // ->bcc('bcc@example.com')
+            // ->replyTo('fabien@example.com')
+            // ->priority(Email::PRIORITY_HIGH)
+            ->subject($subject)
+            ->htmlTemplate('app/mails/delete-account.html.twig')
+            ->context([
+                'lang' => 'en',
+                'link' => $link,
+            ]);
 
-            try {
-                $this->mailer->send($email);
-            } catch (\Exception $exception) {
-                $this->logger->error($exception->getMessage());
-            }
+        try {
+            $this->mailer->send($email);
+        } catch (\Exception $exception) {
+            $this->logger->error($exception->getMessage());
+        }
+    }
+
+    private function sendRegeneratePasswordLink(User $user, string $lang)
+    {
+        $subject = 'Regenerate a new password';
+        $link = $this->webSiteHomeUrl.'/'.$lang.'/user/regenerate-a-new-password/'.$user->getSecretTokenForValidation();
+
+        $email = (new TemplatedEmail())
+            ->from($this->webSiteEmailAddress)
+            ->to($user->getEmail())
+            // ->cc('cc@example.com')
+            // ->bcc('bcc@example.com')
+            // ->replyTo('fabien@example.com')
+            // ->priority(Email::PRIORITY_HIGH)
+            ->subject($subject)
+            ->htmlTemplate('app/mails/regenerate-a-new-password.html.twig')
+            ->context([
+                'lang' => 'en',
+                'link' => $link,
+            ]);
+
+        try {
+            $this->mailer->send($email);
+        } catch (\Exception $exception) {
+            $this->logger->error($exception->getMessage());
         }
     }
 }

@@ -69,7 +69,7 @@ class ContactController extends AbstractController
             return $this->json($data, 400, [], []);
         }
 
-        if($this->contactMessageService->isSpammer($request->getClientIp())) {
+        if ($this->contactMessageService->isSpammer($request->getClientIp())) {
             return $this->json($data, 400, [], []);
         }
 

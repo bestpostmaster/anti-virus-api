@@ -47,6 +47,7 @@ class ContactMessageService
         }
 
         $this->logger->info('Spam detected, IP : '.$ip);
+
         return true;
     }
 }

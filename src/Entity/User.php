@@ -121,6 +121,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $deleteAccountRequested = false;
 
     /** @ORM\Column(type="boolean", nullable=true) */
+    private $newPasswordRequested = false;
+
+    /** @ORM\Column(type="boolean", nullable=true) */
     private $deleteAccountConfirmed = false;
 
     /** @ORM\Column(type="boolean", nullable=false)
@@ -575,5 +578,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIp($ip): void
     {
         $this->ip = $ip;
+    }
+
+    public function isNewPasswordRequested(): bool
+    {
+        return $this->newPasswordRequested;
+    }
+
+    public function setNewPasswordRequested(bool $newPasswordRequested): void
+    {
+        $this->newPasswordRequested = $newPasswordRequested;
     }
 }

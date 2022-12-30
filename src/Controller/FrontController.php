@@ -168,4 +168,47 @@ class FrontController extends AbstractController
             'secretTokenForValidation' => $request->get('token'),
         ]);
     }
+
+    /**
+     * @Route(
+     *     "/{_locale}/user/regenerate-a-new-password/{token}",
+     *     name="delete_my_account_confirmation",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
+     *     }
+     * )
+     */
+    public function regenerateANewPassword(Request $request, UserRepository $userRepository): Response
+    {
+        $user = $userRepository->findOneBy(['secretTokenForValidation' => $request->get('token'), 'newPasswordRequested' => true]);
+        $found = true;
+        $userId = null;
+
+        if (!$user) {
+            $found = false;
+        }
+
+        return $this->render('app/regenerate-a-new-password.html.twig', [
+            'lang' => $request->get('_locale'),
+            'found' => $found,
+            'userId' => $userId,
+            'secretTokenForValidation' => $request->get('token'),
+        ]);
+    }
+
+    /**
+     * @Route(
+     *     "/{_locale}/forgot-my-password",
+     *     name="forgot_my_password",
+     *     requirements={
+     *         "_locale": "en|fr|de|es|zh|ar|hi",
+     *     }
+     * )
+     */
+    public function forgotMyPassword(Request $request): Response
+    {
+        return $this->render('app/forgot-my-password.html.twig', [
+            'lang' => $request->get('_locale'),
+        ]);
+    }
 }
